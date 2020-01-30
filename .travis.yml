@@ -1,0 +1,10 @@
+language: python
+sudo: false
+python:
+  - "3.4"
+  - "3.5"
+  - "3.6"
+cache: pip
+script:
+  - travis_wait pytest --cov-config .coveragerc --cov-report html --cov=GPro
+

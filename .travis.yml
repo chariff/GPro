@@ -1,10 +1,7 @@
 language: python
-sudo: false
 python:
   - "3.6"
-cache: pip
+install:
+  - pip install .
 script:
-  - GPro
-after_success:
-  - pip install coveralls
-  - coveralls
+  - pytest

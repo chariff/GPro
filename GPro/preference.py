@@ -125,7 +125,8 @@ class ProbitPreferenceGP(Kernel, Acquisition):
         self.M_train_ = np.copy(M) if self.copy_data else M
 
         if self.kernel is None:  # Use a RBF kernel as default
-            self.kernel_ = RBF(length_scale=1.0)
+            self.kernel = RBF(length_scale=1.0)
+            self.kernel_ = self.kernel
         else:
             if not hasattr(self.kernel, "get_params"):
                 raise AttributeError("Invalid kernel.")
@@ -257,6 +258,7 @@ class ProbitPreferenceGP(Kernel, Acquisition):
         bounds = np.array(list(bounds.values()))
         if self.acquisition is None:  # Use an ei acquisition as default
             acquisition = ExpectedImprovement(xi=0)
+            self.acquisition = acquisition
         else:
             if not hasattr(self.acquisition, "get_params"):
                 raise AttributeError("Invalid acquisition.")

@@ -1,10 +1,10 @@
 import pandas as pd
 import numpy as np
 from .preference import ProbitPreferenceGP
-from .validations import  check_x_m
+from .validations import check_x_m
 
 
-class GProAPI(ProbitPreferenceGP):
+class GProOptimization(ProbitPreferenceGP):
     """
 
     Parameters
@@ -65,7 +65,7 @@ class GProAPI(ProbitPreferenceGP):
         >>> from GPro.kernels import Matern
         >>> from GPro.posterior import Laplace
         >>> from GPro.acquisitions import UCB
-        >>> from GPro.api import GProAPI
+        >>> from GPro.optimization import GProOptimization
         >>> import numpy as np
 
         >>> GP_params = {'kernel': Matern(length_scale=1, nu=2.5),
@@ -75,17 +75,17 @@ class GProAPI(ProbitPreferenceGP):
         ...      'random_state': None}
         >>> X = np.array([[2], [1]]).reshape(-1, 1)
         >>> M = np.array([0, 1]).reshape(-1, 2)
-        >>> gpro_api = GProAPI(X, M, GP_params)
+        >>> gpr_opt = GProOptimization(X, M, GP_params)
         >>> bounds = {'x0': (0, 10)}
-        >>> console_opt = gpro_api.console_optimization(bounds=bounds, n_iter=1,
-        ...                                             warm_up=100)
+        >>> console_opt = gpr_opt.console_optimization(bounds=bounds, n_iter=1,
+        ...                                            warm_up=100)
         >>> optimal_values, X_post, M_post, f_post = console_opt
         >>> print('optimal values: ', optimal_values)
 
         >>> # Use posterior as prior
-        >>> console_opt = gpro_api.console_optimization(bounds=bounds, n_iter=1,
-        ...                                             warm_up=100,
-        ...                                             f_prior=f_post)
+        >>> console_opt = gpr_opt.console_optimization(bounds=bounds, n_iter=1,
+        ...                                            warm_up=100,
+        ...                                            f_prior=f_post)
         >>> optimal_values, X_post, M_post, f_post = console_opt
         >>> print('optimal values: ', optimal_values)
 
@@ -180,7 +180,7 @@ class GProAPI(ProbitPreferenceGP):
         >>> from GPro.kernels import Matern
         >>> from GPro.posterior import Laplace
         >>> from GPro.acquisitions import UCB
-        >>> from GPro.api import GProAPI
+        >>> from GPro.optimization import GProOptimization
         >>> from scipy.stats import multivariate_normal
         >>> import numpy as np
         >>> import matplotlib.cm as cm
@@ -246,9 +246,9 @@ class GProAPI(ProbitPreferenceGP):
         >>> f_x = f(X)
         >>> M = sorted(range(len(f_x)), key=lambda k: f_x[k], reverse=True)
         >>> M = np.asarray([M], dtype='int8')
-        >>> gpro_api = GProAPI(X, M, GP_params)
-        >>> function_opt = gpro_api.function_optimization(f=f, bounds=bounds, f_iter=d*10,
-        ...                                               warm_up=100, n_iter=1)
+        >>> gpr_opt = GProOptimization(X, M, GP_params)
+        >>> function_opt = gpr_opt.function_optimization(f=f, bounds=bounds, f_iter=d*10,
+        ...                                              warm_up=100, n_iter=1)
 
         >>> optimal_values, X_post, M_post, f_post = function_opt
         >>> print('optimal values: ', optimal_values)

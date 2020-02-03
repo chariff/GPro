@@ -20,7 +20,7 @@ M = np.array([1, 0]).reshape(-1, 2)
 def test_optimization():
     gpr_opt = GProOptimization(X, M)
     function_opt = gpr_opt.function_optimization(f=f, bounds=bounds,
-                                                 f_iter=1,
+                                                 max_iter=1,
                                                  warm_up=1,
                                                  n_iter=1)
 
@@ -35,7 +35,7 @@ def test_params():
     # default GP_parameters
     gpr_opt = GProOptimization(X, M)
     function_opt = gpr_opt.function_optimization(f=f, bounds=bounds,
-                                                 f_iter=1,
+                                                 max_iter=1,
                                                  warm_up=1,
                                                  n_iter=1)
 
@@ -76,7 +76,7 @@ def test_params():
 
     gpr_opt = GProOptimization(X, M, GP_params)
     function_opt = gpr_opt.function_optimization(f=f, bounds=bounds,
-                                                 f_iter=1,
+                                                 max_iter=1,
                                                  warm_up=1,
                                                  n_iter=1)
 
@@ -109,13 +109,20 @@ def test_params():
     assert post_approx_params['s_eval'] == 1
 
     # test console optimization
-    with mock.patch('builtins.input', return_value="p"):
-        with mock.patch('builtins.input', return_value="Q"):
-            assert len(gpr_opt.console_optimization(bounds=bounds, n_iter=1)) == 4
 
-    with mock.patch('builtins.input', return_value="s"):
-        with mock.patch('builtins.input', return_value="Q"):
-            assert len(gpr_opt.console_optimization(bounds=bounds, n_iter=1)) == 4
+    with mock.patch('builtins.input', return_value="Q"):
+        assert len(gpr_opt.console_optimization(bounds=bounds, n_iter=1)) == 4
+
+    with mock.patch('builtins.input', return_value=""):
+        assert len(gpr_opt.console_optimization(bounds=bounds, n_iter=1)) == 4
+
+    with mock.patch('builtins.input', return_value="p"):
+        assert len(gpr_opt.console_optimization(bounds=bounds,
+                                                n_iter=1, max_iter=1)) == 4
+
+    with mock.patch('builtins.input', return_value="p"):
+        assert len(gpr_opt.console_optimization(bounds=bounds,
+                                                n_iter=1, max_iter=1)) == 4
 
 
 if __name__ == '__main__':

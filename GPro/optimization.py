@@ -24,7 +24,7 @@ class GProOptimization(ProbitPreferenceGP):
         self.M = M
 
     def console_optimization(self, bounds, method="L-BFGS-B",
-                             warm_up=1, n_iter=1, f_prior=None):
+                             warm_up=1, n_iter=1, f_prior=None, max_iter=1e4):
         """Bayesian optimization via preferences inputs.
 
         Parameters
@@ -43,6 +43,10 @@ class GProOptimization(ProbitPreferenceGP):
 
         f_prior : array-like, shape = (n_samples, 1), optional (default: None)
             Flat prior with mean zero is applied by default.
+
+        max_iter: integer, optional (default: 1e4)
+            Maximum number of iterations to be performed
+            for the bayesian optimization.
 
         Returns
         -------
@@ -95,7 +99,8 @@ class GProOptimization(ProbitPreferenceGP):
         features = list(bounds.keys())
         M_ind_cpt = M.shape[0] - 1
         pd.set_option('display.max_rows', None)
-        while True:
+        iteration = 0
+        while iteration < max_iter:
             self.fit(X, M, f_prior)
             x_optim = self.bayesopt(bounds, method, warm_up, n_iter)
             f_optim = self.predict(x_optim)
@@ -125,13 +130,14 @@ class GProOptimization(ProbitPreferenceGP):
                 break
             M = np.vstack((M, new_pair))
             M_ind_cpt += 1
+            iteration += 1
         pd.set_option('display.max_rows', 0)
         optimal_values = df['preference'].values
         f_posterior = f_prior
         return optimal_values, X, M, f_posterior
 
-    def function_optimization(self, f, bounds, f_iter=1,
-                              method="L-BFGS-B", warm_up=1, n_iter=1,
+    def function_optimization(self, f, bounds, max_iter=1,
+                              method="L-BFGS-B", warm_up=100, n_iter=1,
                               f_prior=None):
         """Bayesian optimization via function evaluation.
 
@@ -143,7 +149,7 @@ class GProOptimization(ProbitPreferenceGP):
         bounds: dictionary
             Bounds of the search space for the acquisition function.
 
-        f_iter: integer, optional
+        max_iter: integer, optional
             Maximum number of iterations to be performed
             for the bayesian optimization.
 
@@ -247,7 +253,7 @@ class GProOptimization(ProbitPreferenceGP):
         >>> M = sorted(range(len(f_x)), key=lambda k: f_x[k], reverse=True)
         >>> M = np.asarray([M], dtype='int8')
         >>> gpr_opt = GProOptimization(X, M, GP_params)
-        >>> function_opt = gpr_opt.function_optimization(f=f, bounds=bounds, f_iter=d*10,
+        >>> function_opt = gpr_opt.function_optimization(f=f, bounds=bounds, max_iter=d*10,
         ...                                              warm_up=100, n_iter=1)
 
         >>> optimal_values, X_post, M_post, f_post = function_opt
@@ -277,7 +283,7 @@ class GProOptimization(ProbitPreferenceGP):
 
         X, M = check_x_m(self.X, self.M)
         new_pair = M[M.shape[0] - 1]
-        for M_ind_cpt in range((M.shape[0] - 1), f_iter + (M.shape[0] - 1)):
+        for M_ind_cpt in range((M.shape[0] - 1), max_iter + (M.shape[0] - 1)):
             self.fit(X, M, f_prior)
             x_optim = self.bayesopt(bounds, method, warm_up, n_iter)
             f_optim = self.predict(x_optim)

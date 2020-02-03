@@ -7,13 +7,15 @@ exclude_lines =
     pragma: no cover
     .*  # pragma: no cover
     .*  # nocover
-    def __repr__
     raise AssertionError
     raise NotImplementedError
+    raise ValueError
     if 0:
     verbose = .*
     raise
     pass
+    except
+    continue
     if __name__ == .__main__.:
     print(.*)
 

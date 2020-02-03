@@ -1,4 +1,5 @@
 import pytest
+import mock
 from GPro.optimization import GProOptimization
 from GPro.kernels import Matern
 from GPro.posterior import Laplace
@@ -106,6 +107,15 @@ def test_params():
     gpr_opt.post_approx.set_params(**{'s_eval': 1})
     post_approx_params = gpr_opt.post_approx.get_params()
     assert post_approx_params['s_eval'] == 1
+
+    # test console optimization
+    with mock.patch('builtins.input', return_value="p"):
+        with mock.patch('builtins.input', return_value="Q"):
+            assert len(gpr_opt.console_optimization(bounds=bounds, n_iter=1)) == 4
+
+    with mock.patch('builtins.input', return_value="s"):
+        with mock.patch('builtins.input', return_value="Q"):
+            assert len(gpr_opt.console_optimization(bounds=bounds, n_iter=1)) == 4
 
 
 if __name__ == '__main__':

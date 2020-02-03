@@ -1,7 +1,16 @@
 language: python
 python:
+  - "3.4"
+  - "3.5"
   - "3.6"
+before_install:
+  - pip install pip -U
+  - pip install pytest -U
+  - pip install pytest-cov -U
+  - pip install codecov -U
 install:
   - pip install .
 script:
-  - pytest
+  - pytest --cov-config .coveragerc --cov-report html --cov=GPro
+after_success:
+  - codecov

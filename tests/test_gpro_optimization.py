@@ -120,7 +120,7 @@ def test_params():
         assert len(gpr_opt.console_optimization(bounds=bounds,
                                                 n_iter=1, max_iter=1)) == 4
 
-    with mock.patch('builtins.input', return_value="p"):
+    with mock.patch('builtins.input', return_value="s"):
         assert len(gpr_opt.console_optimization(bounds=bounds,
                                                 n_iter=1, max_iter=1)) == 4
 

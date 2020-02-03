@@ -11,7 +11,7 @@ setup(
     install_requires=[
         "numpy >= 1.9.0",
         "scipy >= 0.14.0",
-        "pandas >= 0.22.0"
+        "pandas >= 0.24.0"
     ],
     license='MIT',
 )

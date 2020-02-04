@@ -28,7 +28,6 @@ class Kernel:
                 args.append(parameter.name)
             if parameter.kind == parameter.VAR_POSITIONAL:
                 varargs.append(parameter.name)
-
         if len(varargs) != 0:
             raise RuntimeError("GPro kernels should always "
                                " specify their parameters in the signature"
@@ -42,10 +41,6 @@ class Kernel:
     def set_params(self, **params):
         """Set the parameters of a kernel.
 
-        The method works on simple kernels as well as on nested kernels.
-        The latter have parameters of the form ``<component>__<parameter>``
-        so that it's possible to update each component of a nested object.
-
         Returns
         -------
         self
@@ -54,25 +49,13 @@ class Kernel:
             return self
         valid_params = self.get_params()
         for key, value in params.items():
-            split = key.split('__', 1)
-            if len(split) > 1:
-                # nested objects case
-                name, sub_name = split
-                if name not in valid_params:
-                    raise ValueError('Invalid parameter %s for kernel %s. '
-                                     'Check the list of available parameters '
-                                     'with `kernel.get_params().keys()`.' %
-                                     (name, self))
-                sub_object = valid_params[name]
-                sub_object.set_params({sub_name: value})
-            else:
-                # simple objects case
-                if key not in valid_params:
-                    raise ValueError('Invalid parameter %s for kernel %s. '
-                                     'Check the list of available parameters '
-                                     'with `kernel.get_params().keys()`.' %
-                                     (key, self.__class__.__name__))
-                setattr(self, key, value)
+            # simple objects case
+            if key not in valid_params:
+                raise ValueError('Invalid parameter %s for kernel %s. '
+                                 'Check the list of available parameters '
+                                 'with `kernel.get_params().keys()`.' %
+                                 (key, self.__class__.__name__))
+            setattr(self, key, value)
         return self
 
 

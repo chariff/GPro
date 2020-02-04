@@ -42,11 +42,6 @@ class PosteriorApproximation:
     def set_params(self, **params):
         """Set the parameters of this posterior approximation.
 
-        The method works on simple posterior approximation as well as on
-        nested posterior approximation. The latter have parameters of the
-        form ``<component>__<parameter>`` so that it's possible to
-        update each component of a nested object.
-
         Returns
         -------
         self
@@ -55,27 +50,13 @@ class PosteriorApproximation:
             return self
         valid_params = self.get_params()
         for key, value in params.items():
-            split = key.split('__', 1)
-            if len(split) > 1:
-                # nested objects case
-                name, sub_name = split
-                if name not in valid_params:
-                    raise ValueError('Invalid parameter %s for posterior '
-                                     'approximation %s. '
-                                     'Check the list of available parameters '
-                                     'with `kernel.get_params().keys()`.' %
-                                     (name, self))
-                sub_object = valid_params[name]
-                sub_object.set_params({sub_name: value})
-            else:
-                # simple objects case
-                if key not in valid_params:
-                    raise ValueError('Invalid parameter %s for posterior '
-                                     'approximation %s. '
-                                     'Check the list of available parameters '
-                                     'with `kernel.get_params().keys()`.' %
-                                     (key, self.__class__.__name__))
-                setattr(self, key, value)
+            if key not in valid_params:
+                raise ValueError('Invalid parameter %s for posterior '
+                                 'approximation %s. '
+                                 'Check the list of available parameters '
+                                 'with `kernel.get_params().keys()`.' %
+                                 (key, self.__class__.__name__))
+            setattr(self, key, value)
         return self
 
 

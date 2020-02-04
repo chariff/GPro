@@ -40,11 +40,6 @@ class Acquisition:
     def set_params(self, **params):
         """Set the parameters of an acquisition function.
 
-        The method works on simple acquisition functions as well as on
-        nested acquisition functions. The latter have parameters of the
-        form ``<component>__<parameter>`` so that it's possible to
-        update each component of a nested object.
-
         Returns
         -------
         self
@@ -53,22 +48,13 @@ class Acquisition:
             return self
         valid_params = self.get_params()
         for key, value in params.items():
-            split = key.split('__', 1)
-            if len(split) > 1:
-                raise ValueError('Invalid number of parameters for '
-                                 'acquisition function %s. '
+            if key not in valid_params:
+                raise ValueError('Invalid parameter %s for acquisition '
+                                 'function %s. '
                                  'Check the list of available parameters '
                                  'with `Acquisition.get_params().keys()`.' %
-                                 self)
-            else:
-                # simple objects case
-                if key not in valid_params:
-                    raise ValueError('Invalid parameter %s for acquisition '
-                                     'function %s. '
-                                     'Check the list of available parameters '
-                                     'with `Acquisition.get_params().keys()`.' %
-                                     (key, self.__class__.__name__))
-                setattr(self, key, value)
+                                 (key, self.__class__.__name__))
+            setattr(self, key, value)
         return self
 
 

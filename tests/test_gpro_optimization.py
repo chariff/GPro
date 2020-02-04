@@ -48,6 +48,7 @@ def test_params():
     kernel_params = gpr_opt.kernel.get_params()
     assert len(kernel_params) == 1
     assert 'length_scale' in kernel_params
+    assert not gpr_opt.kernel.anisotropic
     gpr_opt.kernel.set_params(**{'length_scale': 2})
     kernel_params = gpr_opt.kernel.get_params()
     assert kernel_params['length_scale'] == 2
@@ -90,6 +91,7 @@ def test_params():
     assert len(kernel_params) == 2
     assert 'nu' in kernel_params
     gpr_opt.kernel.set_params(**{'nu': 1.5})
+    assert not gpr_opt.kernel.anisotropic
     kernel_params = gpr_opt.kernel.get_params()
     assert kernel_params['nu'] == 1.5
 
@@ -123,6 +125,20 @@ def test_params():
     with mock.patch('builtins.input', return_value="s"):
         assert len(gpr_opt.console_optimization(bounds=bounds,
                                                 n_iter=1, max_iter=1)) == 4
+
+    gpr_opt.kernel.set_params(**{'nu': .5})
+    with mock.patch('builtins.input', return_value="s"):
+        assert len(gpr_opt.console_optimization(bounds=bounds,
+                                                n_iter=1, max_iter=1)) == 4
+    gpr_opt.kernel.set_params(**{'nu': 3})
+    with mock.patch('builtins.input', return_value="s"):
+        assert len(gpr_opt.console_optimization(bounds=bounds,
+                                                n_iter=1, max_iter=1)) == 4
+
+    gpr_opt.acquisition.set_params()
+    gpr_opt.acquisition.set_params(**{'kappa': 2, 'invalid': 2})
+    gpr_opt.kernel.set_params()
+    gpr_opt.kernel.set_params(**{'nu': 1.5, 'invalid': 2})
 
 
 if __name__ == '__main__':

@@ -174,6 +174,10 @@ class Matern(RBF):
         super().__init__(length_scale)
         self.nu = nu
 
+    @property
+    def anisotropic(self):
+        return np.iterable(self.length_scale) and len(self.length_scale) > 1
+
     def __call__(self, X, Y=None):
         """Return the kernel k(X, Y).
 

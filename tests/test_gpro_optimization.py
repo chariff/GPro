@@ -82,7 +82,7 @@ def test_params():
     assert post_approx_params['s_eval'] == 1
 
     # custom GP_parameters
-    GP_params = {'kernel': Matern(length_scale=1, nu=2.5),
+    GP_params = {'kernel': Matern(length_scale=[1, 1], nu=2.5),
                  'post_approx': Laplace(s_eval=1e-5, max_iter=1000,
                                         eta=0.01, tol=1e-3),
                  'acquisition': UCB(kappa=2.576),
@@ -105,7 +105,7 @@ def test_params():
     assert len(kernel_params) == 2
     assert 'nu' in kernel_params
     gpr_opt.kernel.set_params(**{'nu': 1.5})
-    assert not gpr_opt.kernel.anisotropic
+    assert gpr_opt.kernel.anisotropic
     kernel_params = gpr_opt.kernel.get_params()
     assert kernel_params['nu'] == 1.5
 
@@ -152,6 +152,7 @@ def test_params():
     gpr_opt.acquisition.set_params()
     gpr_opt.kernel.set_params()
     gpr_opt.post_approx.set_params()
+
 
 
 if __name__ == '__main__':

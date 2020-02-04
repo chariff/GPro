@@ -85,7 +85,7 @@ class ProbitPreferenceGP(Kernel, Acquisition):
     ...                          alpha=1e-5)
     >>> gpr.fit(X, M)
     >>> X = np.array([[2], [1]]).reshape(-1, 1)
-    >>> print(gpr.predict(X, True))
+    >>> print(gpr.predict(X, return_y_var=True))
     """
 
     def __init__(self, kernel=None, alpha=1e-5,
@@ -228,7 +228,7 @@ class ProbitPreferenceGP(Kernel, Acquisition):
         else:
             return y_mean
 
-    def bayesopt(self, bounds, method="L-BFGS-B", warm_up=1, n_iter=1):
+    def bayesopt(self, bounds, method="L-BFGS-B", n_init=1, n_solve=1):
         """Bayesian optimization based on the optimization of a
         utility function of the attributes of the posterior distribution.
 
@@ -240,11 +240,13 @@ class ProbitPreferenceGP(Kernel, Acquisition):
         method: str or callable, optional
         Type of solver.
 
-        warm_up: integer, optional
-        number of times to randomly sample the acquisition function
+        n_init: integer, optional
+            Number of initialization points for the solver. Obtained
+            by randomly sampling the acquisition function.
 
-        n_iter: integer, optional
-        Maximum number of iterations to be performed by the solver.
+        n_solve: integer, optional
+            The solver will be run n_solve times.
+            Cannot be superior to n_init.
 
         Returns
         -------
@@ -255,7 +257,8 @@ class ProbitPreferenceGP(Kernel, Acquisition):
 
         if not hasattr(self, "f_posterior_"):
             raise AttributeError("Unfitted gaussian probit regression model.")
-
+        if n_init < n_solve:
+            raise ValueError("n_init must be inferior of equal to n_solve.")
         check_bounds(self.X_train_, bounds)
         # convert bounds values to ndarray
         bounds = np.array(list(bounds.values()))
@@ -280,7 +283,7 @@ class ProbitPreferenceGP(Kernel, Acquisition):
             return samples
 
         d = self.X_train_.shape[1]
-        x_tries = random_sample(d=d, bounds=bounds, n=warm_up,
+        x_tries = random_sample(d=d, bounds=bounds, n=n_init,
                                 random_state=self.random_state)
 
         def aqc_optim(x, y_max):
@@ -292,7 +295,7 @@ class ProbitPreferenceGP(Kernel, Acquisition):
         x_arg_max = ys.argmax()
         x_max = x_tries[x_arg_max].reshape(1, -1)
         max_acq = ys.max()
-        x_seeds = x_tries[np.argsort(ys.flat)][:n_iter]
+        x_seeds = x_tries[np.argsort(ys.flat)][:n_solve]
 
         for x_try in x_seeds:
             # Find the minimum of -1* acquisition function

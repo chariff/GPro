@@ -21,8 +21,8 @@ def test_optimization():
     gpr_opt = GProOptimization(X, M)
     function_opt = gpr_opt.function_optimization(f=f, bounds=bounds,
                                                  max_iter=1,
-                                                 warm_up=1,
-                                                 n_iter=1)
+                                                 n_init=1,
+                                                 n_solve=1)
 
     optimal_values, X_post, M_post, f_post = function_opt
     assert len(optimal_values) == 2
@@ -34,8 +34,8 @@ def test_optimization():
     gpr_opt = GProOptimization(X_post, M_post)
     function_opt = gpr_opt.function_optimization(f=f, bounds=bounds,
                                                  max_iter=1,
-                                                 warm_up=1,
-                                                 n_iter=1,
+                                                 n_init=1,
+                                                 n_solve=1,
                                                  f_prior=f_post)
     optimal_values, X_post, M_post, f_post = function_opt
     assert len(optimal_values) == 2
@@ -49,8 +49,8 @@ def test_params():
     gpr_opt = GProOptimization(X, M)
     function_opt = gpr_opt.function_optimization(f=f, bounds=bounds,
                                                  max_iter=1,
-                                                 warm_up=1,
-                                                 n_iter=1)
+                                                 n_init=1,
+                                                 n_solve=1)
 
     optimal_values, X_post, M_post, f_post = function_opt
     assert len(optimal_values) == 2
@@ -92,8 +92,8 @@ def test_params():
     gpr_opt = GProOptimization(X, M, GP_params)
     function_opt = gpr_opt.function_optimization(f=f, bounds=bounds,
                                                  max_iter=1,
-                                                 warm_up=1,
-                                                 n_iter=1)
+                                                 n_init=1,
+                                                 n_solve=1)
 
     optimal_values, X_post, M_post, f_post = function_opt
     assert len(optimal_values) == 2
@@ -127,27 +127,27 @@ def test_params():
     # test console optimization
 
     with mock.patch('builtins.input', return_value="Q"):
-        assert len(gpr_opt.console_optimization(bounds=bounds, n_iter=1)) == 4
+        assert len(gpr_opt.console_optimization(bounds=bounds, n_solve=1)) == 4
 
     with mock.patch('builtins.input', return_value=""):
-        assert len(gpr_opt.console_optimization(bounds=bounds, n_iter=1)) == 4
+        assert len(gpr_opt.console_optimization(bounds=bounds, n_solve=1)) == 4
 
     with mock.patch('builtins.input', return_value="p"):
         assert len(gpr_opt.console_optimization(bounds=bounds,
-                                                n_iter=1, max_iter=1)) == 4
+                                                n_solve=1, max_iter=1)) == 4
 
     with mock.patch('builtins.input', return_value="s"):
         assert len(gpr_opt.console_optimization(bounds=bounds,
-                                                n_iter=1, max_iter=1)) == 4
+                                                n_solve=1, max_iter=1)) == 4
 
     gpr_opt.kernel.set_params(**{'nu': .5, 'length_scale': 1})
     with mock.patch('builtins.input', return_value="s"):
         assert len(gpr_opt.console_optimization(bounds=bounds,
-                                                n_iter=1, max_iter=1)) == 4
+                                                n_solve=1, max_iter=1)) == 4
     gpr_opt.kernel.set_params(**{'nu': 3})
     with mock.patch('builtins.input', return_value="s"):
         assert len(gpr_opt.console_optimization(bounds=bounds,
-                                                n_iter=1, max_iter=1)) == 4
+                                                n_solve=1, max_iter=1)) == 4
 
     gpr_opt.acquisition.set_params()
     gpr_opt.kernel.set_params()

@@ -24,7 +24,7 @@ class GProOptimization(ProbitPreferenceGP):
         self.M = M
 
     def console_optimization(self, bounds, method="L-BFGS-B",
-                             warm_up=1, n_iter=1, f_prior=None, max_iter=1e4):
+                             n_init=1, n_solve=1, f_prior=None, max_iter=1e4):
         """Bayesian optimization via preferences inputs.
 
         Parameters
@@ -35,11 +35,13 @@ class GProOptimization(ProbitPreferenceGP):
         method: str or callable, optional
             Type of solver.
 
-        warm_up: integer, optional
-            Number of times to randomly sample the acquisition function
+        n_init: integer, optional
+            Number of initialization points for the solver. Obtained
+            by randomly sampling the acquisition function.
 
-        n_iter: integer, optional
-            Maximum number of iterations to be performed by the solver.
+        n_solve: integer, optional
+            The solver will be run n_solve times.
+            Cannot be superior to n_init.
 
         f_prior : array-like, shape = (n_samples, 1), optional (default: None)
             Flat prior with mean zero is applied by default.
@@ -81,15 +83,15 @@ class GProOptimization(ProbitPreferenceGP):
         >>> M = np.array([0, 1]).reshape(-1, 2)
         >>> gpr_opt = GProOptimization(X, M, GP_params)
         >>> bounds = {'x0': (0, 10)}
-        >>> console_opt = gpr_opt.console_optimization(bounds=bounds, n_iter=1,
-        ...                                            warm_up=100)
+        >>> console_opt = gpr_opt.console_optimization(bounds=bounds, n_solve=1,
+        ...                                            n_init=100)
         >>> optimal_values, X_post, M_post, f_post = console_opt
         >>> print('optimal values: ', optimal_values)
 
         >>> # Use posterior as prior
         >>> gpr_opt = GProOptimization(X_post, M_post, GP_params)
-        >>> console_opt = gpr_opt.console_optimization(bounds=bounds, n_iter=1,
-        ...                                            warm_up=100,
+        >>> console_opt = gpr_opt.console_optimization(bounds=bounds, n_solve=1,
+        ...                                            n_init=100,
         ...                                            f_prior=f_post)
         >>> optimal_values, X_post, M_post, f_post = console_opt
         >>> print('optimal values: ', optimal_values)
@@ -99,11 +101,11 @@ class GProOptimization(ProbitPreferenceGP):
         X, M = check_x_m(self.X, self.M)
         features = list(bounds.keys())
         M_ind_cpt = M.shape[0] - 1
-        pd.set_option('display.max_rows', None)
+        pd.set_option('display.max_columns', None)
         iteration = 0
         while iteration < max_iter:
             self.fit(X, M, f_prior)
-            x_optim = self.bayesopt(bounds, method, warm_up, n_iter)
+            x_optim = self.bayesopt(bounds, method, n_init, n_solve)
             f_optim = self.predict(x_optim)
             f_prior = np.concatenate((self.posterior, f_optim))
             X = np.concatenate((X, x_optim))
@@ -113,9 +115,9 @@ class GProOptimization(ProbitPreferenceGP):
             M_ind_proposal = M_ind_cpt + 2
             # current preference vs suggestion.
             df = pd.DataFrame(data=np.concatenate((X[[M_ind_current]],
-                                                   X[[M_ind_proposal]])).T,
-                              columns=['preference', 'suggestion'],
-                              index=features)
+                                                   X[[M_ind_proposal]])),
+                              columns=features,
+                              index=['preference', 'suggestion'])
             print(df)
             input_msg = "Iteration %d, preference or suggestion? (Q to quit): " \
                         % M_ind_cpt
@@ -132,13 +134,13 @@ class GProOptimization(ProbitPreferenceGP):
             M = np.vstack((M, new_pair))
             M_ind_cpt += 1
             iteration += 1
-        pd.set_option('display.max_rows', 0)
-        optimal_values = df['preference'].values
+        pd.set_option('display.max_columns', 0)
+        optimal_values = df.loc['preference'].values
         f_posterior = f_prior
         return optimal_values, X, M, f_posterior
 
     def function_optimization(self, f, bounds, max_iter=1,
-                              method="L-BFGS-B", warm_up=100, n_iter=1,
+                              method="L-BFGS-B", n_init=100, n_solve=1,
                               f_prior=None):
         """Bayesian optimization via function evaluation.
 
@@ -157,11 +159,13 @@ class GProOptimization(ProbitPreferenceGP):
         method: str or callable, optional
             Type of solver.
 
-        warm_up: integer, optional
-            Number of times to randomly sample the acquisition function
+        n_init: integer, optional
+            Number of initialization points for the solver. Obtained
+            by randomly sampling the acquisition function.
 
-        n_iter: integer, optional
-            Maximum number of iterations to be performed by the solver.
+        n_solve: integer, optional
+            The solver will be run n_solve times.
+            Cannot be superior to n_init.
 
         f_prior : array-like, shape = (n_samples, 1), optional (default: None)
             Flat prior with mean zero is applied by default.
@@ -245,7 +249,7 @@ class GProOptimization(ProbitPreferenceGP):
         >>> target_p = [.7]
         >>> scale_covar = 2
         >>> theta = sample_gm_centers(d, bounds, n_class, scale_covar,
-                                  target_p, random_state=3)
+        ...                           target_p, random_state=3)
         >>> f = lambda x: gm(x, theta)
         >>> # X, M, init
         >>> X = random_sample(d, np.array(list(bounds.values())), n=2)
@@ -255,7 +259,7 @@ class GProOptimization(ProbitPreferenceGP):
         >>> M = np.asarray([M], dtype='int8')
         >>> gpr_opt = GProOptimization(X, M, GP_params)
         >>> function_opt = gpr_opt.function_optimization(f=f, bounds=bounds, max_iter=d*10,
-        ...                                              warm_up=100, n_iter=1)
+        ...                                              n_init=100, n_solve=1)
 
         >>> optimal_values, X_post, M_post, f_post = function_opt
         >>> print('optimal values: ', optimal_values)
@@ -286,7 +290,7 @@ class GProOptimization(ProbitPreferenceGP):
         new_pair = M[M.shape[0] - 1]
         for M_ind_cpt in range((M.shape[0] - 1), max_iter + (M.shape[0] - 1)):
             self.fit(X, M, f_prior)
-            x_optim = self.bayesopt(bounds, method, warm_up, n_iter)
+            x_optim = self.bayesopt(bounds, method, n_init, n_solve)
             f_optim = self.predict(x_optim)
             f_prior = np.concatenate((self.posterior, f_optim))
             X = np.concatenate((X, x_optim))

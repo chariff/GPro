@@ -136,9 +136,8 @@ def test_params():
                                                 n_iter=1, max_iter=1)) == 4
 
     gpr_opt.acquisition.set_params()
-    gpr_opt.acquisition.set_params(**{'kappa': 2, 'invalid': 2})
     gpr_opt.kernel.set_params()
-    gpr_opt.kernel.set_params(**{'nu': 1.5, 'invalid': 2})
+    gpr_opt.kernel.set_params(**{'nu': 1.5, 'length_scale': 2})
 
 
 if __name__ == '__main__':

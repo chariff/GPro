@@ -55,16 +55,11 @@ class Acquisition:
         for key, value in params.items():
             split = key.split('__', 1)
             if len(split) > 1:
-                # nested objects case
-                name, sub_name = split
-                if name not in valid_params:
-                    raise ValueError('Invalid parameter %s for acquisition '
-                                     'function %s. '
-                                     'Check the list of available parameters '
-                                     'with `Acquisition.get_params().keys()`.' %
-                                     (name, self))
-                sub_object = valid_params[name]
-                sub_object.set_params({sub_name: value})
+                raise ValueError('Invalid number of parameters for '
+                                 'acquisition function %s. '
+                                 'Check the list of available parameters '
+                                 'with `Acquisition.get_params().keys()`.' %
+                                 self)
             else:
                 # simple objects case
                 if key not in valid_params:

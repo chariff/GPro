@@ -30,6 +30,19 @@ def test_optimization():
     assert len(M_post) == 2
     assert len(f_post) == 3
 
+    # Use posterior as prior
+    gpr_opt = GProOptimization(X_post, M_post)
+    function_opt = gpr_opt.function_optimization(f=f, bounds=bounds,
+                                                 max_iter=1,
+                                                 warm_up=1,
+                                                 n_iter=1,
+                                                 f_prior=f_post)
+    optimal_values, X_post, M_post, f_post = function_opt
+    assert len(optimal_values) == 2
+    assert len(X_post) == 4
+    assert len(M_post) == 3
+    assert len(f_post) == 4
+
 
 def test_params():
     # default GP_parameters
@@ -73,6 +86,7 @@ def test_params():
                  'post_approx': Laplace(s_eval=1e-5, max_iter=1000,
                                         eta=0.01, tol=1e-3),
                  'acquisition': UCB(kappa=2.576),
+                 'alpha': [1e-5, 1e-5],
                  'random_state': 0}
 
     gpr_opt = GProOptimization(X, M, GP_params)
@@ -137,7 +151,7 @@ def test_params():
 
     gpr_opt.acquisition.set_params()
     gpr_opt.kernel.set_params()
-    gpr_opt.kernel.set_params(**{'nu': 1.5, 'length_scale': 2})
+    gpr_opt.post_approx.set_params()
 
 
 if __name__ == '__main__':

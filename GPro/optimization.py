@@ -87,6 +87,7 @@ class GProOptimization(ProbitPreferenceGP):
         >>> print('optimal values: ', optimal_values)
 
         >>> # Use posterior as prior
+        >>> gpr_opt = GProOptimization(X_post, M_post, GP_params)
         >>> console_opt = gpr_opt.console_optimization(bounds=bounds, n_iter=1,
         ...                                            warm_up=100,
         ...                                            f_prior=f_post)

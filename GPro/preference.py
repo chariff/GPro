@@ -5,7 +5,8 @@ from scipy.optimize import minimize
 import numpy as np
 import warnings
 from .validations import assert_array,  assert_finite, check_x_m, \
-    check_kernel, check_post_approx, check_acquisition, check_bounds
+    check_kernel, check_post_approx, check_acquisition,\
+    check_bounds, convert_array
 
 
 class ProbitPreferenceGP(Kernel, Acquisition):
@@ -141,16 +142,18 @@ class ProbitPreferenceGP(Kernel, Acquisition):
                 raise AttributeError("Invalid post_approx.")
             check_post_approx(**self.post_approx.get_params())
 
-        if np.iterable(self.alpha) and self.alpha.shape[0] != y.shape[0]:
-            if self.alpha.shape[0] == 1:
-                self.alpha = self.alpha[0]
-            else:
-                raise ValueError("alpha must be a scalar or an array"
-                                 " with same number of entries as y.(%d != %d)"
-                                 % (self.alpha.shape[0], X.shape[0]))
+        if np.iterable(self.alpha):
+            self.alpha = convert_array(self.alpha)
+            if self.alpha.shape[0] != self.X_train_.shape[0]:
+                if self.alpha.shape[0] == 1:
+                    self.alpha = self.alpha[0]
+                else:
+                    raise ValueError("alpha must be a scalar or an array"
+                                     " with same number of entries as X.(%d != %d)"
+                                     % (self.alpha.shape[0], X.shape[0]))
         elif not np.isscalar(self.alpha):
             raise ValueError("alpha must be a scalar or an array"
-                             " with same number of entries as y.(%d != %d)"
+                             " with same number of entries as X.(%d != %d)"
                              % (self.alpha.shape[0], X.shape[0]))
 
         # compute quantities required for prediction

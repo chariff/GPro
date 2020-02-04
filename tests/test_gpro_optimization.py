@@ -86,7 +86,7 @@ def test_params():
                  'post_approx': Laplace(s_eval=1e-5, max_iter=1000,
                                         eta=0.01, tol=1e-3),
                  'acquisition': UCB(kappa=2.576),
-                 'alpha': [1e-5, 1e-5],
+                 'alpha': [1e-5],
                  'random_state': 0}
 
     gpr_opt = GProOptimization(X, M, GP_params)

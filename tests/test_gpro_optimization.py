@@ -140,7 +140,7 @@ def test_params():
         assert len(gpr_opt.console_optimization(bounds=bounds,
                                                 n_iter=1, max_iter=1)) == 4
 
-    gpr_opt.kernel.set_params(**{'nu': .5})
+    gpr_opt.kernel.set_params(**{'nu': .5, 'length_scale': 1})
     with mock.patch('builtins.input', return_value="s"):
         assert len(gpr_opt.console_optimization(bounds=bounds,
                                                 n_iter=1, max_iter=1)) == 4
@@ -152,7 +152,6 @@ def test_params():
     gpr_opt.acquisition.set_params()
     gpr_opt.kernel.set_params()
     gpr_opt.post_approx.set_params()
-
 
 
 if __name__ == '__main__':

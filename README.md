@@ -73,7 +73,7 @@ print('optimal values: ', optimal_values)
 gpr_opt = ProbitBayesianOptimization(X_post, M_post, GP_params)
 console_opt = gpr_opt.console_optimization(bounds=bounds, n_init=100, n_solve=10,
                                            f_prior=f_post)
-
+```
 >>>                   x0        x1        x2
 >>> preference  0.806058  5.567739  9.924089
 >>> suggestion  0.420045  7.317108  9.950919
@@ -91,7 +91,6 @@ console_opt = gpr_opt.console_optimization(bounds=bounds, n_init=100, n_solve=10
 >>> preference  1.083927  4.273101  9.905242
 >>> suggestion  1.570381  5.079068  8.668470
 >>> Iteration 2, preference (p) or suggestion (s)? (Q to quit): Q
-```
 
 ```python
 from GPro.kernels import Matern
@@ -171,4 +170,4 @@ if d == 2:
     plt.show()
 ```
 
-![](https://github.com/chariff/GPro/examples/mvn_example.png)
+![](https://github.com/chariff/GPro/blob/master/examples/mvn_example.png)

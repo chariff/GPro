@@ -4,7 +4,7 @@ from .preference import ProbitPreferenceGP
 from .validations import check_x_m
 
 
-class GProOptimization(ProbitPreferenceGP):
+class ProbitBayesianOptimization(ProbitPreferenceGP):
     """
 
     Parameters
@@ -71,7 +71,7 @@ class GProOptimization(ProbitPreferenceGP):
         >>> from GPro.kernels import Matern
         >>> from GPro.posterior import Laplace
         >>> from GPro.acquisitions import UCB
-        >>> from GPro.optimization import GProOptimization
+        >>> from GPro.optimization import ProbitBayesianOptimization
         >>> import numpy as np
 
         >>> GP_params = {'kernel': Matern(length_scale=1, nu=2.5),
@@ -79,9 +79,9 @@ class GProOptimization(ProbitPreferenceGP):
         ...                             eta=0.01, tol=1e-3),
         ...      'acquisition': UCB(kappa=2.576),
         ...      'random_state': None}
-        >>> X = np.array([[2], [1]]).reshape(-1, 1)
+        >>> X = np.random.sample(size=(2, 3)) * 10
         >>> M = np.array([0, 1]).reshape(-1, 2)
-        >>> gpr_opt = GProOptimization(X, M, GP_params)
+        >>> gpr_opt = ProbitBayesianOptimization(X, M, GP_params)
         >>> bounds = {'x0': (0, 10)}
         >>> console_opt = gpr_opt.console_optimization(bounds=bounds, n_solve=1,
         ...                                            n_init=100)
@@ -89,7 +89,7 @@ class GProOptimization(ProbitPreferenceGP):
         >>> print('optimal values: ', optimal_values)
 
         >>> # Use posterior as prior
-        >>> gpr_opt = GProOptimization(X_post, M_post, GP_params)
+        >>> gpr_opt = ProbitBayesianOptimization(X_post, M_post, GP_params)
         >>> console_opt = gpr_opt.console_optimization(bounds=bounds, n_solve=1,
         ...                                            n_init=100,
         ...                                            f_prior=f_post)
@@ -119,8 +119,8 @@ class GProOptimization(ProbitPreferenceGP):
                               columns=features,
                               index=['preference', 'suggestion'])
             print(df)
-            input_msg = "Iteration %d, preference or suggestion? (Q to quit): " \
-                        % M_ind_cpt
+            input_msg = "Iteration %d, preference (p) or suggestion (s)? " \
+                        "(Q to quit): " % M_ind_cpt
             preference_input = input(input_msg)
             if preference_input == 'Q':
                 break
@@ -191,98 +191,78 @@ class GProOptimization(ProbitPreferenceGP):
         >>> from GPro.kernels import Matern
         >>> from GPro.posterior import Laplace
         >>> from GPro.acquisitions import UCB
-        >>> from GPro.optimization import GProOptimization
+        >>> from GPro.optimization import ProbitBayesianOptimization
         >>> from scipy.stats import multivariate_normal
         >>> import numpy as np
+        >>> from sklearn import datasets
         >>> import matplotlib.cm as cm
         >>> import matplotlib.pyplot as plt
 
+
         >>> # function optimization example.
-        >>> def random_sample(d, bounds, n, random_state=None):
-        ...     # Uniform sampling given bounds.
-        ...     if random_state is None:
-        ...        random_state = np.random.randint(1e6)
-        ...     random_state = np.random.RandomState(random_state)
-        ...     sample = random_state.uniform(bounds[:, 0], bounds[:, 1],
+        >>> def random_sample(n, d, bounds, random_state=None):
+        >>>     # Uniform sampling given bounds.
+        >>>     if random_state is None:
+        >>>         random_state = np.random.randint(1e6)
+        >>>     random_state = np.random.RandomState(random_state)
+        >>>     sample = random_state.uniform(bounds[:, 0], bounds[:, 1],
         ...                                   size=(n, d))
-        ...     return sample
+        >>>     return sample
 
 
-        >>> def sample_gm_centers(d, bounds, n_class=2, scale_covar=1,
-        ...                       target_p=.9, random_state=None):
-        ...     # Sample parameters of a gaussian mixture.
-        ...     # sample centroids.
-        ...     centroids = random_sample(d=d, bounds=np.array(list(bounds.values())),
-        ...                              n=n_class, random_state=random_state)
-        ...     # sample covariance matrices.
-        ...     # from sklearn import datasets
-        ...     # covars = datasets.make_spd_matrix(d, random_state=None)
-        ...     covars = np.eye(d) * scale_covar
-        ...     # sample mixture distribution conditionally to target_p.
-        ...     target_p = np.array([1]) if n_class == 1 else np.array(target_p)
-        ...     a, b = 0, (1 - target_p[0])
-        ...     left_p = a + (b - a) * np.random.rand(n_class - 1)
-        ...     probs = np.concatenate((target_p, (left_p / (left_p.sum()) * b)))
-        ...     theta = {'mu': centroids, 'covar': covars, 'probs': probs}
-        ...     return theta
+        >>> def sample_normal_params(n, d, bounds, scale_sigma=1, random_state=None):
+        >>>     # Sample parameters of a multivariate normal distribution
+        >>>     # sample centroids.
+        >>>     mu = random_sample(n=n, d=d, bounds=np.array(list(bounds.values())),
+        ...                        random_state=random_state)
+        >>>     # sample covariance matrices.
+        >>>     sigma = datasets.make_spd_matrix(d, random_state) * scale_sigma
+        >>>     theta = {'mu': mu, 'sigma': sigma}
+        >>>     return theta
 
 
-        >>> def gm(x, theta):
-        ...     # Gaussian mixture pdf.
-        ...     centroids, covar = theta['mu'], theta['covar']
-        ...     probs = theta['probs']
-        ...     n = x.shape[0]
-        ...     comp = np.zeros(n)
-        ...     for k, p in enumerate(probs, 0):
-        ...         comp += p * multivariate_normal.pdf(x, centroids[k], cov=covar)
-        ...     return comp
-
-
+        >>> d = 2
+        >>> bounds = {'x' + str(i): (0, 10) for i in range(0, d)}
+        >>> theta = sample_normal_params(n=1, d=d, bounds=bounds, scale_sigma=10, random_state=12)
+        >>> f = lambda x: multivariate_normal.pdf(x, mean=theta['mu'][0], cov=theta['sigma'])
+        >>> # X, M, init
+        >>> X = random_sample(n=2, d=d, bounds=np.array(list(bounds.values())))
+        >>> X = np.asarray(X, dtype='float64')
+        >>> M = sorted(range(len(f(X))), key=lambda k: f(X)[k], reverse=True)
+        >>> M = np.asarray([M], dtype='int8')
         >>> GP_params = {'kernel': Matern(length_scale=1, nu=2.5),
         ...              'post_approx': Laplace(s_eval=1e-5, max_iter=1000,
         ...                                     eta=0.01, tol=1e-3),
         ...              'acquisition': UCB(kappa=2.576),
-        ...              'random_state': None}
-        >>> d = 2
-        >>> bounds = {'x'+str(i): (0, 10) for i in range(0, d)}
-        >>> n_class = 2
-        >>> target_p = [.7]
-        >>> scale_covar = 2
-        >>> theta = sample_gm_centers(d, bounds, n_class, scale_covar,
-        ...                           target_p, random_state=3)
-        >>> f = lambda x: gm(x, theta)
-        >>> # X, M, init
-        >>> X = random_sample(d, np.array(list(bounds.values())), n=2)
-        >>> X = np.asarray(X, dtype='float64')
-        >>> f_x = f(X)
-        >>> M = sorted(range(len(f_x)), key=lambda k: f_x[k], reverse=True)
-        >>> M = np.asarray([M], dtype='int8')
-        >>> gpr_opt = GProOptimization(X, M, GP_params)
+        ...              'alpha': 1e-5,
+        ...              'random_state': 2020}
+        >>> gpr_opt = ProbitBayesianOptimization(X, M, GP_params)
         >>> function_opt = gpr_opt.function_optimization(f=f, bounds=bounds, max_iter=d*10,
-        ...                                              n_init=100, n_solve=1)
+        ...                                              n_init=1000, n_solve=1)
 
         >>> optimal_values, X_post, M_post, f_post = function_opt
         >>> print('optimal values: ', optimal_values)
 
         >>> # rmse
-        >>> print('rmse: ', .5 * sum(np.sqrt((optimal_values - theta['mu'][0])**2)))
+        >>> print('rmse: ', .5 * sum(np.sqrt((optimal_values - theta['mu'][0]) ** 2)))
         >>> # 2d plot
         >>> if d == 2:
-        ...     resolution = 10
-        ...     x_min, x_max = bounds['x0'][0], bounds['x0'][1]
-        ...     y_min, y_max = bounds['x1'][0], bounds['x1'][1]
-        ...     x = np.linspace(x_min, x_max, resolution)
-        ...     y = np.linspace(y_min, y_max, resolution)
-        ...     X, Y = np.meshgrid(x, y)
-        ...     grid = np.empty((resolution ** 2, 2))
-        ...     grid[:, 0] = X.flat
-        ...     grid[:, 1] = Y.flat
-        ...     Z = gm(grid, theta)
-        ...     plt.imshow(Z.reshape(-1, resolution), interpolation="bicubic",
-        ...                origin="lower", cmap=cm.rainbow,
-        ...                extent=[x_min, x_max, y_min, y_max])
-        ...     plt.scatter(optimal_values[0], optimal_values[1], color='black', s=10)
-        ...     plt.show()
+        >>>     resolution = 10
+        >>>     x_min, x_max = bounds['x0'][0], bounds['x0'][1]
+        >>>     y_min, y_max = bounds['x1'][0], bounds['x1'][1]
+        >>>     x = np.linspace(x_min, x_max, resolution)
+        >>>     y = np.linspace(y_min, y_max, resolution)
+        >>>     X, Y = np.meshgrid(x, y)
+        >>>     grid = np.empty((resolution ** 2, 2))
+        >>>     grid[:, 0] = X.flat
+        >>>     grid[:, 1] = Y.flat
+        >>>     Z = f(grid)
+        >>>     plt.imshow(Z.reshape(-1, resolution), interpolation="bicubic",
+        ...                origin="lower", cmap=cm.rainbow, extent=[x_min, x_max, y_min, y_max])
+        >>>     plt.scatter(optimal_values[0], optimal_values[1], color='black', s=10)
+        >>>     plt.title('Target function')
+        >>>     plt.colorbar()
+        >>>     plt.show()
 
         """
 

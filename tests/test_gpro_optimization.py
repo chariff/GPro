@@ -1,6 +1,6 @@
 import pytest
 import mock
-from GPro.optimization import GProOptimization
+from GPro.optimization import ProbitBayesianOptimization
 from GPro.kernels import Matern
 from GPro.posterior import Laplace
 from GPro.acquisitions import UCB
@@ -18,7 +18,7 @@ M = np.array([1, 0]).reshape(-1, 2)
 
 
 def test_optimization():
-    gpr_opt = GProOptimization(X, M)
+    gpr_opt = ProbitBayesianOptimization(X, M)
     function_opt = gpr_opt.function_optimization(f=f, bounds=bounds,
                                                  max_iter=1,
                                                  n_init=1,
@@ -31,7 +31,7 @@ def test_optimization():
     assert len(f_post) == 3
 
     # Use posterior as prior
-    gpr_opt = GProOptimization(X_post, M_post)
+    gpr_opt = ProbitBayesianOptimization(X_post, M_post)
     function_opt = gpr_opt.function_optimization(f=f, bounds=bounds,
                                                  max_iter=1,
                                                  n_init=1,
@@ -46,7 +46,7 @@ def test_optimization():
 
 def test_params():
     # default GP_parameters
-    gpr_opt = GProOptimization(X, M)
+    gpr_opt = ProbitBayesianOptimization(X, M)
     function_opt = gpr_opt.function_optimization(f=f, bounds=bounds,
                                                  max_iter=1,
                                                  n_init=1,
@@ -89,7 +89,7 @@ def test_params():
                  'alpha': [1e-5],
                  'random_state': 0}
 
-    gpr_opt = GProOptimization(X, M, GP_params)
+    gpr_opt = ProbitBayesianOptimization(X, M, GP_params)
     function_opt = gpr_opt.function_optimization(f=f, bounds=bounds,
                                                  max_iter=1,
                                                  n_init=1,

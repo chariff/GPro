@@ -171,4 +171,4 @@ if d == 2:
     plt.show()
 ```
 
-![](https://github.com/chariff/GPro/blob/master/examples/mvn_example.png)
+![](https://github.com/chariff/GPro/examples/mvn_example.png)

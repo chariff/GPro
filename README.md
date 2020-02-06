@@ -39,25 +39,47 @@ Brief guide to using GPro.
 ```python
 from GPro.preference import ProbitPreferenceGP
 import numpy as np
-
-# Training data consisting of numeric real positive values.
-# A minimum of two values is required.
-X = np.array([[2], [1]]).reshape(-1, 1)
-# Target choices. A preference is an array of positive
-# integers of shape = (2,). preference[0], is an index
-# of X preferred over preference[1], which is an index of X.
-M = np.array([0, 1]).reshape(-1, 2)
-# Instantiate a ProbitPreferenceGP object with default parameters.
-gpr = ProbitPreferenceGP()
-# Fit a Gaussian process. A flat prior with mean zero is applied by default.
-gpr.fit(X, M, f_prior=None)
-# Predict values.
-gpr.predict(X, return_y_var=True)
->>> (array([[ 0.22129742],
->>>        [-0.22129742]]), array([[0.00316225],
->>>        [0.00316225]]))
 ```
+Training data consisting of numeric real positive values.
+A minimum of two values is required.
+```python
+X = np.array([[2], [1]]).reshape(-1, 1)
+```
+M is an array containing preferences. A preference is an 
+array of positive integers of shape = (2,). The left integer of a 
+given preference is the index of a value in X which is preferred 
+over another value of X indexed by the right integer of the same
+preference array.
+In the following example, 2 is preferred over 1.
+```python
+M = np.array([0, 1]).reshape(-1, 2)
+```
+Instantiate a ProbitPreferenceGP object with default parameters.
+```python
+gpr = ProbitPreferenceGP()
+```
+Fit a Gaussian process. A flat prior with mean zero is applied by default.
+```python
+gpr.fit(X, M, f_prior=None)
+```
+Predict new values.
 
+```python
+X_new = np.linspace(-6, 9, 100).reshape(-1, 1)
+predicted_values, predicted_vars = gpr.predict(X_new, return_y_var=True)
+plt.plot(X_new, np.zeros(100), 'k--', label='GP prior')
+plt.plot(X_new, predicted_values, 'r-', label='GP posterior')
+plt.ylabel('f(X)')
+plt.xlabel('X')
+plt.gca().fill_between(X_new.flatten(),
+                       (predicted_values - predicted_vars).flatten(),
+                       (predicted_values + predicted_vars).flatten(),
+                       color="#b0e0e6", label='GP posterior s.e.')
+plt.legend()
+plt.ylim([-2, 2])
+plt.show()
+```
+![](https://github.com/chariff/GPro/blob/master/examples/posterior_example.png)
 
 ## 2. Probit Bayesian optimization via preferences inputs.
 

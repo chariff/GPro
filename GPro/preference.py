@@ -1,3 +1,12 @@
+# Author: Chariff Alkhassim <chariff.alkhassim@gmail.com>
+# License: MIT
+
+# Note: this module is inspired by the gaussian process module
+# of the sklearn-package and by the util module of
+# the BayesianOptimization package. Courtesy of Jan Hendrik Metzen
+# and Fernando M. F. Nogueira.
+
+
 from .kernels import Kernel, RBF
 from .posterior import Laplace
 from .acquisitions import Acquisition, ExpectedImprovement

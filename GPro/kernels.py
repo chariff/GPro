@@ -4,6 +4,9 @@ import numpy as np
 from scipy import special
 from scipy.spatial.distance import cdist, pdist, squareform
 
+# Note: this module is strongly inspired by the gaussian process module
+# of the sklearn-package courtesy Jan Hendrik Metzen.
+
 
 class Kernel:
     """Base class for all kernels.

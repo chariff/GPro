@@ -12,7 +12,7 @@ learning based on Gaussian processes. Preference relations are captured
 in a Bayesian framework which allows in turn for global optimization of 
 the inferred functions (Gaussian processes) in as few iterations as possible. 
 
-Brief guide to using GPro
+Brief guide to using GPro.
 =========================
 
 ## 1. Fitting and making Predictions.

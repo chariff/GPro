@@ -2,14 +2,14 @@ from setuptools import setup, find_packages
 
 setup(
     name='GPro',
-    version='1.0.0',
+    version='1.0.1',
     url='https://github.com/chariff/GPro',
     packages=find_packages(),
     author='Chariff Alkhassim',
     author_email='chariff.alkhassim@gmail.com',
-    description='Preference Learning with Gaussian Processes',
+    description='Preference Learning with Gaussian Processes.',
     long_description='Python implementation of a probabilistic kernel approach '
-                     'to preference learning based on Gaussian processes',
+                     'to preference learning based on Gaussian processes.',
     install_requires=[
         "numpy >= 1.9.0",
         "scipy >= 0.14.0",

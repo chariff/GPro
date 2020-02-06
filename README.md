@@ -1,6 +1,11 @@
+
+
+# Preference learning with gaussian processes.
+
 [![Build Status](https://travis-ci.org/chariff/GPro.svg?branch=master)](https://travis-ci.org/chariff/GPro)
 [![Codecov](https://codecov.io/github/chariff/GPro/badge.svg?branch=master&service=github)](https://codecov.io/github/chariff/GPro?branch=master)
 [![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
+
 
 Python implementation of a probabilistic kernel approach to preference 
 learning based on Gaussian processes. Preference relations are captured 
@@ -96,7 +101,7 @@ console_opt = gpr_opt.console_optimization(bounds=bounds, n_init=100, n_solve=10
 
 ## 2. Probit Bayesian optimization of a black-box function.
 
-**DISCLAIMER:** For a testing purpose, we maximize a multivariate normal pdf.
+**Disclaimer:** For testing purposes, we maximize a multivariate normal pdf.
 ```python
 from GPro.kernels import Matern
 from GPro.posterior import Laplace
@@ -190,3 +195,20 @@ if d == 2:
 ```
 
 ![](https://github.com/chariff/GPro/blob/master/examples/mvn_example.png)
+
+### Dependencies
+GPro requires:
+* Python (>= 3.5)
+* NumPy (>= 1.9.0)
+* SciPy (>= 0.14.0)
+* Pandas (>= 0.24.0)
+
+
+### References:
+* http://mlg.eng.cam.ac.uk/zoubin/papers/icml05chuwei-pl.pdf
+* https://arxiv.org/pdf/1012.2599.pdf
+* https://www.cs.ox.ac.uk/people/nando.defreitas/publications/BayesOptLoop.pdf
+* http://www.gaussianprocess.org/gpml/
+
+
+    -- Chariff Alkhassim

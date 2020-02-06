@@ -34,6 +34,8 @@ GPro requires:
 Brief guide to using GPro.
 =========================
 
+Checkout the package docstrings for more informations.
+
 ## 1. Fitting and making Predictions.
 
 ```python
@@ -63,26 +65,41 @@ Fit a Gaussian process. A flat prior with mean zero is applied by default.
 gpr.fit(X, M, f_prior=None)
 ```
 Predict new values.
-
 ```python
 X_new = np.linspace(-6, 9, 100).reshape(-1, 1)
 predicted_values, predicted_vars = gpr.predict(X_new, return_y_var=True)
+```
+Plot.
+```python
 plt.plot(X_new, np.zeros(100), 'k--', label='GP prior')
 plt.plot(X_new, predicted_values, 'r-', label='GP posterior')
+plt.plot(X.flat, gpr.predict(X).flat, 'bx', label='Preference')
 plt.ylabel('f(X)')
 plt.xlabel('X')
 plt.gca().fill_between(X_new.flatten(),
                        (predicted_values - predicted_vars).flatten(),
                        (predicted_values + predicted_vars).flatten(),
-                       color="#b0e0e6", label='GP posterior s.e.')
+                       color="#b0e0e6", label='GP posterior s.d.')
 plt.legend()
 plt.ylim([-2, 2])
 plt.show()
 ```
-![](https://github.com/chariff/GPro/blob/master/examples/posterior_example.png)
+The following plot shows how the posterior gaussian process is adjusted to 
+the data i.e. 2 is preferred to 1. One can also notice how the standard 
+deviation is small where there is data.  
 
-## 2. Probit Bayesian optimization via preferences inputs.
+![Gaussian process posterior](https://github.com/chariff/GPro/blob/master/examples/posterior_example.png)
 
+## 2. Interactive bayesian optimization.
+
+Preference relations are captured in a Bayesian framework 
+which allows for global optimization of the latent function 
+(modelized by gaussian processes) describing the preference relations.
+Interactive bayesian optimization with probit responses works by querying
+the user with a paired comparison and by subsequently updating the 
+Gaussian process model. The iterative procedure optimizes a utility function,
+seeking a balance between exploration and exploitation of the latent function, 
+to present the user with a new set of instances.
 ```python
 from GPro.kernels import Matern
 from GPro.posterior import Laplace
@@ -90,34 +107,40 @@ from GPro.acquisitions import UCB
 from GPro.optimization import ProbitBayesianOptimization
 import numpy as np
 
-
-# Training data consisting of numeric real positive values.
-# A minimum of two values is required.
+# 3D example. Initialization.
 X = np.random.sample(size=(2, 3)) * 10
-# Target choices. A preference is an array of positive
-# integers of shape = (2,). preference[0], is an index
-# of X preferred over preference[1], which is an index of X.
 M = np.array([0, 1]).reshape(-1, 2)
-# Parameters for the ProbitBayesianOptimization object.
+```
+Custom parameters for the ProbitBayesianOptimization object. 
+Checkout the package docstrings for more informations on the parameters.
+```python
 GP_params = {'kernel': Matern(length_scale=1, nu=2.5),
              'post_approx': Laplace(s_eval=1e-5, max_iter=1000,
                                     eta=0.01, tol=1e-3),
              'acquisition': UCB(kappa=2.576),
              'alpha': 1e-5,
              'random_state': 2020}
-# instantiate a ProbitBayesianOptimization object with custom parameters.
+```
+Instantiate a ProbitBayesianOptimization object with custom parameters.
+```python
 gpr_opt = ProbitBayesianOptimization(X, M, GP_params)
-# Bounded region of optimization space.
+```
+Bounded region of optimization space.
+```python
 bounds = {'x0': (0, 10), 'x1': (0, 10), 'x2': (0, 10)}
-# Console optimization method.
-console_opt = gpr_opt.console_optimization(bounds=bounds, n_init=100, n_solve=10)
+```
+Interactive optimization method.
+Checkout the package docstrings for more informations on the parameters.
+```python
+console_opt = gpr_opt.interactive_optimization(bounds=bounds, n_init=100, n_solve=10)
 optimal_values, X_post, M_post, f_post = console_opt
 print('optimal values: ', optimal_values)
-
-# Use posterior as prior
-# PreferenceBayesianOptimization
+```
+One cas use informative prior. Let's use posterior as prior for the sake of
+example.
+```python
 gpr_opt = ProbitBayesianOptimization(X_post, M_post, GP_params)
-console_opt = gpr_opt.console_optimization(bounds=bounds, n_init=100, n_solve=10,
+console_opt = gpr_opt.interactive_optimization(bounds=bounds, n_init=100, n_solve=10,
                                            f_prior=f_post)
 ```
 
@@ -139,8 +162,12 @@ console_opt = gpr_opt.console_optimization(bounds=bounds, n_init=100, n_solve=10
     >>> suggestion  1.570381  5.079068  8.668470
     >>> Iteration 2, preference (p) or suggestion (s)? (Q to quit): Q
 
+Download the algorithm with GUI at 
+* https://sensguide.com
+  
+![](https://github.com/chariff/GPro/blob/master/examples/sensguide.png)
 
-## 2. Probit Bayesian optimization of a black-box function.
+## 2. Bayesian optimization of a black-box function.
 
 **Disclaimer:** For testing purposes, we maximize a multivariate normal pdf.
 ```python
@@ -153,21 +180,20 @@ import numpy as np
 from sklearn import datasets
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
-
-
-# function optimization example.
+```
+Uniform sampling given bounds.
+```python
 def random_sample(n, d, bounds, random_state=None):
-    # Uniform sampling given bounds.
     if random_state is None:
         random_state = np.random.randint(1e6)
     random_state = np.random.RandomState(random_state)
     sample = random_state.uniform(bounds[:, 0], bounds[:, 1],
                                   size=(n, d))
     return sample
-
-
+```
+Sample parameters of a multivariate normal distribution
+```python
 def sample_normal_params(n, d, bounds, scale_sigma=1, random_state=None):
-    # Sample parameters of a multivariate normal distribution
     # sample centroids.
     mu = random_sample(n=n, d=d, bounds=np.array(list(bounds.values())),
                        random_state=random_state)
@@ -175,8 +201,9 @@ def sample_normal_params(n, d, bounds, scale_sigma=1, random_state=None):
     sigma = datasets.make_spd_matrix(d, random_state) * scale_sigma
     theta = {'mu': mu, 'sigma': sigma}
     return theta
-
-# example is in 2 dimensions.
+```
+Example is in 2 dimensions.
+```python
 d = 2
 # Bounded region of optimization space.
 bounds = {'x' + str(i): (0, 10) for i in range(0, d)}
@@ -201,19 +228,21 @@ GP_params = {'kernel': Matern(length_scale=1, nu=2.5),
              'random_state': 2020}
 # instantiate a ProbitBayesianOptimization object with custom parameters
 gpr_opt = ProbitBayesianOptimization(X, M, GP_params)
-# Console optimization method.
+```
+Function optimization method.
+```python
 function_opt = gpr_opt.function_optimization(f=f, bounds=bounds, max_iter=d*10,
                                              n_init=1000, n_solve=1)
 
 optimal_values, X_post, M_post, f_post = function_opt
 print('optimal values: ', optimal_values)
 ```
-    optimal values:  [1.45340052 7.22687626]
+    >>> optimal values:  [1.45340052 7.22687626]
 ```python
 # rmse
 print('rmse: ', .5 * sum(np.sqrt((optimal_values - theta['mu'][0]) ** 2)))
 ```
-    rmse:  0.13092430596422377
+    >>> rmse:  0.13092430596422377
 ```python
 # 2d plot
 if d == 2:

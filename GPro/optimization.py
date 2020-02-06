@@ -23,7 +23,7 @@ class ProbitBayesianOptimization(ProbitPreferenceGP):
         self.X = X
         self.M = M
 
-    def console_optimization(self, bounds, method="L-BFGS-B",
+    def interactive_optimization(self, bounds, method="L-BFGS-B",
                              n_init=1, n_solve=1, f_prior=None, max_iter=1e4):
         """Bayesian optimization via preferences inputs.
 
@@ -83,14 +83,14 @@ class ProbitBayesianOptimization(ProbitPreferenceGP):
         >>> M = np.array([0, 1]).reshape(-1, 2)
         >>> gpr_opt = ProbitBayesianOptimization(X, M, GP_params)
         >>> bounds = {'x0': (0, 10)}
-        >>> console_opt = gpr_opt.console_optimization(bounds=bounds, n_solve=1,
+        >>> console_opt = gpr_opt.interactive_optimization(bounds=bounds, n_solve=1,
         ...                                            n_init=100)
         >>> optimal_values, X_post, M_post, f_post = console_opt
         >>> print('optimal values: ', optimal_values)
 
         >>> # Use posterior as prior
         >>> gpr_opt = ProbitBayesianOptimization(X_post, M_post, GP_params)
-        >>> console_opt = gpr_opt.console_optimization(bounds=bounds, n_solve=1,
+        >>> console_opt = gpr_opt.interactive_optimization(bounds=bounds, n_solve=1,
         ...                                            n_init=100,
         ...                                            f_prior=f_post)
         >>> optimal_values, X_post, M_post, f_post = console_opt

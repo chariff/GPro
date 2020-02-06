@@ -10,7 +10,26 @@
 Python implementation of a probabilistic kernel approach to preference 
 learning based on Gaussian processes. Preference relations are captured 
 in a Bayesian framework which allows in turn for global optimization of 
-the inferred functions (Gaussian processes) in as few iterations as possible. 
+the inferred functions (Gaussian processes) in as few iterations as possible.
+
+Installation
+============
+
+### Installation
+* From PyPI:
+
+      pip install GPro
+
+* From GitHub:
+
+      pip install git+https://github.com/chariff/GPro.git
+
+### Dependencies
+GPro requires:
+* Python (>= 3.5)
+* NumPy (>= 1.9.0)
+* SciPy (>= 0.14.0)
+* Pandas (>= 0.24.0) 
 
 Brief guide to using GPro.
 =========================
@@ -195,14 +214,6 @@ if d == 2:
 ```
 
 ![](https://github.com/chariff/GPro/blob/master/examples/mvn_example.png)
-
-### Dependencies
-GPro requires:
-* Python (>= 3.5)
-* NumPy (>= 1.9.0)
-* SciPy (>= 0.14.0)
-* Pandas (>= 0.24.0)
-
 
 ### References:
 * http://mlg.eng.cam.ac.uk/zoubin/papers/icml05chuwei-pl.pdf

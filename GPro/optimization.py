@@ -24,7 +24,8 @@ class ProbitBayesianOptimization(ProbitPreferenceGP):
         self.M = M
 
     def interactive_optimization(self, bounds, method="L-BFGS-B",
-                             n_init=1, n_solve=1, f_prior=None, max_iter=1e4):
+                                 n_init=1, n_solve=1, f_prior=None,
+                                 max_iter=1e4, print_suggestion=True):
         """Bayesian optimization via preferences inputs.
 
         Parameters
@@ -43,16 +44,21 @@ class ProbitBayesianOptimization(ProbitPreferenceGP):
             The solver will be run n_solve times.
             Cannot be superior to n_init.
 
-        f_prior : array-like, shape = (n_samples, 1), optional (default: None)
+        f_prior: array-like, shape = (n_samples, 1), optional (default: None)
             Flat prior with mean zero is applied by default.
 
         max_iter: integer, optional (default: 1e4)
             Maximum number of iterations to be performed
             for the bayesian optimization.
 
+        print_suggestion: Boolean, optional (default: True)
+            If set to false, max_iter must be equal to 1.
+
         Returns
         -------
         optimal_values : array-like, shape = (n_features, )
+
+        suggestion : array-like, shape = (n_features, )
 
         X : array-like, shape = (n_samples, n_features)
             Feature values in training data.
@@ -63,7 +69,7 @@ class ProbitBayesianOptimization(ProbitPreferenceGP):
             of X preferred over preference[1], c, which is an
             index of X.
 
-        f_posterior  : array-like, shape = (n_samples, 1)
+        f_posterior : array-like, shape = (n_samples, 1)
             Posterior distribution of the  Gaussian Process.
 
         Examples
@@ -85,7 +91,7 @@ class ProbitBayesianOptimization(ProbitPreferenceGP):
         >>> bounds = {'x0': (0, 10)}
         >>> console_opt = gpr_opt.interactive_optimization(bounds=bounds, n_solve=1,
         ...                                            n_init=100)
-        >>> optimal_values, X_post, M_post, f_post = console_opt
+        >>> optimal_values, suggestion, X_post, M_post, f_post = console_opt
         >>> print('optimal values: ', optimal_values)
 
         >>> # Use posterior as prior
@@ -93,11 +99,16 @@ class ProbitBayesianOptimization(ProbitPreferenceGP):
         >>> console_opt = gpr_opt.interactive_optimization(bounds=bounds, n_solve=1,
         ...                                            n_init=100,
         ...                                            f_prior=f_post)
-        >>> optimal_values, X_post, M_post, f_post = console_opt
+        >>> optimal_values, suggestion, X_post, M_post, f_post = console_opt
         >>> print('optimal values: ', optimal_values)
 
         """
-
+        if not max_iter:
+            raise ValueError('max_iter must be superior to 0.')
+        print()
+        if not print_suggestion and max_iter > 1:
+            raise ValueError('When print_suggestion is set to False, '
+                             'max_iter must be set to 1.')
         X, M = check_x_m(self.X, self.M)
         features = list(bounds.keys())
         M_ind_cpt = M.shape[0] - 1
@@ -118,26 +129,30 @@ class ProbitBayesianOptimization(ProbitPreferenceGP):
                                                    X[[M_ind_proposal]])),
                               columns=features,
                               index=['preference', 'suggestion'])
-            print(df)
-            input_msg = "Iteration %d, preference (p) or suggestion (s)? " \
-                        "(Q to quit): " % M_ind_cpt
-            preference_input = input(input_msg)
-            if preference_input == 'Q':
-                break
-            # left index is preferred over right index as a convention.
-            elif preference_input == 'p':
-                new_pair = np.array([M_ind_current, M_ind_proposal])
-            elif preference_input == 's':
-                new_pair = np.array([M_ind_proposal, M_ind_current])
+            if print_suggestion:
+                print(df)
+                input_msg = "Iteration %d, preference (p) or suggestion (s)? " \
+                            "(Q to quit): " % M_ind_cpt
+                preference_input = input(input_msg)
+                if preference_input == 'Q':
+                    break
+                # left index is preferred over right index as a convention.
+                elif preference_input == 'p':
+                    new_pair = np.array([M_ind_current, M_ind_proposal])
+                elif preference_input == 's':
+                    new_pair = np.array([M_ind_proposal, M_ind_current])
+                else:
+                    break
+                M = np.vstack((M, new_pair))
+                M_ind_cpt += 1
+                iteration += 1
             else:
                 break
-            M = np.vstack((M, new_pair))
-            M_ind_cpt += 1
-            iteration += 1
         pd.set_option('display.max_columns', 0)
         optimal_values = df.loc['preference'].values
+        suggestion = df.loc['suggestion'].values
         f_posterior = f_prior
-        return optimal_values, X, M, f_posterior
+        return optimal_values, suggestion, X, M, f_posterior
 
     def function_optimization(self, f, bounds, max_iter=1,
                               method="L-BFGS-B", n_init=100, n_solve=1,

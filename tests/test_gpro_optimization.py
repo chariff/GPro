@@ -127,27 +127,31 @@ def test_params():
     # test console optimization
 
     with mock.patch('builtins.input', return_value="Q"):
-        assert len(gpr_opt.interactive_optimization(bounds=bounds, n_solve=1)) == 4
+        assert len(gpr_opt.interactive_optimization(bounds=bounds, n_solve=1)) == 5
 
     with mock.patch('builtins.input', return_value=""):
-        assert len(gpr_opt.interactive_optimization(bounds=bounds, n_solve=1)) == 4
+        assert len(gpr_opt.interactive_optimization(bounds=bounds, n_solve=1)) == 5
 
     with mock.patch('builtins.input', return_value="p"):
         assert len(gpr_opt.interactive_optimization(bounds=bounds,
-                                                    n_solve=1, max_iter=1)) == 4
+                                                    n_solve=1, max_iter=1)) == 5
 
     with mock.patch('builtins.input', return_value="s"):
         assert len(gpr_opt.interactive_optimization(bounds=bounds,
-                                                    n_solve=1, max_iter=1)) == 4
+                                                    n_solve=1, max_iter=1)) == 5
 
     gpr_opt.kernel.set_params(**{'nu': .5, 'length_scale': 1})
     with mock.patch('builtins.input', return_value="s"):
         assert len(gpr_opt.interactive_optimization(bounds=bounds,
-                                                    n_solve=1, max_iter=1)) == 4
+                                                    n_solve=1, max_iter=1)) == 5
     gpr_opt.kernel.set_params(**{'nu': 3})
     with mock.patch('builtins.input', return_value="s"):
         assert len(gpr_opt.interactive_optimization(bounds=bounds,
-                                                    n_solve=1, max_iter=1)) == 4
+                                                    n_solve=1, max_iter=1)) == 5
+
+    assert len(gpr_opt.interactive_optimization(bounds=bounds,
+                                                n_solve=1, max_iter=1,
+                                                print_suggestion=False)) == 5
 
     gpr_opt.acquisition.set_params()
     gpr_opt.kernel.set_params()

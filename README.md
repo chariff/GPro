@@ -162,11 +162,6 @@ console_opt = gpr_opt.interactive_optimization(bounds=bounds, n_init=100, n_solv
     >>> suggestion  1.570381  5.079068  8.668470
     >>> Iteration 2, preference (p) or suggestion (s)? (Q to quit): Q
 
-Download the algorithm with a GUI fully written in python at 
-* https://sensguide.com
-  
-![](https://github.com/chariff/GPro/blob/master/examples/sensguide.png)
-
 ## 2. Bayesian optimization of a black-box function.
 
 **Disclaimer:** For testing purposes, we maximize a multivariate normal pdf.

@@ -85,16 +85,29 @@ class ProbitPreferenceGP(Kernel, Acquisition):
 
     Examples
     --------
-    >>> from GPro.kernels import Matern
+    >>> import matplotlib.pyplot as plt
     >>> from GPro.preference import ProbitPreferenceGP
     >>> import numpy as np
-    >>> X = np.array([[2], [1]]).reshape(-1, 1)
-    >>> M = np.array([0, 1]).reshape(-1, 2)
-    >>> gpr = ProbitPreferenceGP(kernel=Matern(length_scale=1, nu=2.5),
-    ...                          alpha=1e-5)
+
+    >>> X = np.array([[2], [1]])
+    >>> M = np.array([[0, 1]])
+    >>> gpr = ProbitPreferenceGP()
     >>> gpr.fit(X, M)
-    >>> X = np.array([[2], [1]]).reshape(-1, 1)
-    >>> print(gpr.predict(X, return_y_var=True))
+    >>> X_new = np.linspace(-6, 9, 100).reshape(-1, 1)
+    >>> predicted_values, predicted_vars = gpr.predict(X_new, return_y_var=True)
+    >>> plt.plot(X_new, np.zeros(100), 'k--', label='GP prior')
+    >>> plt.plot(X_new, predicted_values, 'r-', label='GP posterior')
+    >>> plt.plot(X.flat, gpr.predict(X).flat, 'bx', label='Preference')
+    >>> plt.ylabel('f(X)')
+    >>> plt.xlabel('X')
+    >>> plt.gca().fill_between(X_new.flatten(),
+                           (predicted_values - predicted_vars).flatten(),
+                           (predicted_values + predicted_vars).flatten(),
+                           color="#b0e0e6", label='GP posterior s.d.')
+
+    >>> plt.legend()
+    >>> plt.ylim([-2, 2.5])
+    >>> plt.show()
     """
 
     def __init__(self, kernel=None, alpha=1e-5,

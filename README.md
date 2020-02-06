@@ -133,18 +133,10 @@ Interactive optimization method.
 Checkout the package docstrings for more informations on the parameters.
 ```python
 console_opt = gpr_opt.interactive_optimization(bounds=bounds, n_init=100, n_solve=10)
-optimal_values, X_post, M_post, f_post = console_opt
+optimal_values, suggestion, X_post, M_post, f_post = console_opt
 print('optimal values: ', optimal_values)
 ```
-One cas use informative prior. Let's use posterior as prior for the sake of
-example.
-```python
-gpr_opt = ProbitBayesianOptimization(X_post, M_post, GP_params)
-console_opt = gpr_opt.interactive_optimization(bounds=bounds, n_init=100, n_solve=10,
-                                           f_prior=f_post)
-```
-
-    >>>                   x0        x1        x2
+>>>                   x0        x1        x2
     >>> preference  0.806058  5.567739  9.924089
     >>> suggestion  0.420045  7.317108  9.950919
     >>> Iteration 0, preference (p) or suggestion (s)? (Q to quit): p
@@ -157,10 +149,15 @@ console_opt = gpr_opt.interactive_optimization(bounds=bounds, n_init=100, n_solv
     >>> suggestion  1.570381  5.079068  8.668470
     >>> Iteration 2, preference (p) or suggestion (s)? (Q to quit): Q
     >>> optimal values:  [1.08392668 4.27310139 9.90524192]
-                      x0        x1        x2
-    >>> preference  1.083927  4.273101  9.905242
-    >>> suggestion  1.570381  5.079068  8.668470
-    >>> Iteration 2, preference (p) or suggestion (s)? (Q to quit): Q
+One can use informative prior. Let's use posterior as prior for the sake of
+example.
+```python
+gpr_opt = ProbitBayesianOptimization(X_post, M_post, GP_params)
+console_opt = gpr_opt.interactive_optimization(bounds=bounds, n_init=100, 
+                                               n_solve=10, f_prior=f_post,
+                                               max_iter=1, print_suggestion=False)
+optimal_values, suggestion, X_post, M_post, f_post = console_opt
+```
 
 ## 2. Bayesian optimization of a black-box function.
 

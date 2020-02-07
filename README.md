@@ -136,7 +136,7 @@ console_opt = gpr_opt.interactive_optimization(bounds=bounds, n_init=100, n_solv
 optimal_values, suggestion, X_post, M_post, f_post = console_opt
 print('optimal values: ', optimal_values)
 ```
->>>                   x0        x1        x2
+    >>>                   x0        x1        x2
     >>> preference  0.806058  5.567739  9.924089
     >>> suggestion  0.420045  7.317108  9.950919
     >>> Iteration 0, preference (p) or suggestion (s)? (Q to quit): p

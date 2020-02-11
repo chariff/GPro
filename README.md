@@ -158,7 +158,8 @@ console_opt = gpr_opt.interactive_optimization(bounds=bounds, n_init=100,
                                                max_iter=1, print_suggestion=False)
 optimal_values, suggestion, X_post, M_post, f_post = console_opt
 ```
-
+Download the algorithm with a GUI fully written in python on
+* https://sensguide.com
 ## 2. Bayesian optimization of a black-box function.
 
 **Disclaimer:** For testing purposes, we maximize a multivariate normal pdf.

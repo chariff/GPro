@@ -71,20 +71,20 @@ predicted_values, predicted_vars = gpr.predict(X_new, return_y_var=True)
 ```
 Plot.
 ```python
-plt.plot(X_new, np.zeros(100), 'k--', label='GP prior')
-plt.plot(X_new, predicted_values, 'r-', label='GP posterior')
+plt.plot(X_new, np.zeros(100), 'k--', label='GP predictive prior')
+plt.plot(X_new, predicted_values, 'r-', label='GP predictive posterior')
 plt.plot(X.flat, gpr.predict(X).flat, 'bx', label='Preference')
 plt.ylabel('f(X)')
 plt.xlabel('X')
 plt.gca().fill_between(X_new.flatten(),
                        (predicted_values - predicted_vars).flatten(),
                        (predicted_values + predicted_vars).flatten(),
-                       color="#b0e0e6", label='GP posterior s.d.')
+                       color="#b0e0e6", label='GP predictive posterior s.d.')
 plt.legend()
 plt.ylim([-2, 2])
 plt.show()
 ```
-The following plot shows how the posterior gaussian process is adjusted to 
+The following plot shows how the posterior predictive gaussian process is adjusted to 
 the data i.e. 2 is preferred to 1. One can also notice how the standard 
 deviation is small where there is data.  
 

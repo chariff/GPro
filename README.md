@@ -43,7 +43,7 @@ from GPro.preference import ProbitPreferenceGP
 import numpy as np
 ```
 Training data consisting of numeric real positive values.
-A minimum of two values is required.
+A minimum of two values is required. The following example is in 2D.
 ```python
 X = np.array([2, 1]).reshape(-1, 1)
 ```

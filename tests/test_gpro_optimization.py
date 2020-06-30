@@ -11,7 +11,7 @@ def f(x):
     return x.sum()
 
 
-bounds = {'x1': (0, 10), 'x2': (0, 10)}
+bounds = {'x1': (-10, 10), 'x2': (-10, 10)}
 
 X = np.array([[3, 4], [2, 5]])
 M = np.array([1, 0]).reshape(-1, 2)

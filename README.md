@@ -45,7 +45,7 @@ import numpy as np
 Training data consisting of numeric real positive values.
 A minimum of two values is required.
 ```python
-X = np.array([[2], [1]]).reshape(-1, 1)
+X = np.array([2, 1]).reshape(-1, 1)
 ```
 M is an array containing preferences. A preference is an 
 array of positive integers of shape = (2,). The left integer of a 

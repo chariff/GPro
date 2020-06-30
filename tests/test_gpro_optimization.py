@@ -13,7 +13,7 @@ def f(x):
 
 bounds = {'x1': (0, 10), 'x2': (0, 10)}
 
-X = np.array([[1, 0], [2, 5]]).reshape(-1, 2)
+X = np.array([[3, 4], [2, 5]])
 M = np.array([1, 0]).reshape(-1, 2)
 
 
@@ -151,7 +151,8 @@ def test_params():
 
     assert len(gpr_opt.interactive_optimization(bounds=bounds,
                                                 n_solve=1, max_iter=1,
-                                                print_suggestion=False)) == 5
+                                                print_suggestion=False
+                                                )) == 5
 
     gpr_opt.acquisition.set_params()
     gpr_opt.kernel.set_params()

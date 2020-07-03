@@ -137,18 +137,19 @@ optimal_values, suggestion, X_post, M_post, f_post = console_opt
 print('optimal values: ', optimal_values)
 ```
     >>>                   x0        x1        x2
-    >>> preference  0.806058  5.567739  9.924089
-    >>> suggestion  0.420045  7.317108  9.950919
+    >>> preference  0.306996  3.581879  4.844135
+    >>> suggestion  0.000000  2.749200  3.287625
     >>> Iteration 0, preference (p) or suggestion (s)? (Q to quit): p
     >>>                   x0        x1        x2
-    >>> preference  0.806058  5.567739  9.924089
-    >>> suggestion  1.083927  4.273101  9.905242
+    >>> preference  0.306996  3.581879  4.844135
+    >>> suggestion  0.289541  4.118421  6.052125
     >>> Iteration 1, preference (p) or suggestion (s)? (Q to quit): s
     >>>                   x0        x1        x2
-    >>> preference  1.083927  4.273101  9.905242
-    >>> suggestion  1.570381  5.079068  8.668470
+    >>> preference  0.289541  4.118421  6.052125
+    >>> suggestion  1.601063  4.300604  5.208000
     >>> Iteration 2, preference (p) or suggestion (s)? (Q to quit): Q
-    >>> optimal values:  [1.08392668 4.27310139 9.90524192]
+    >>> optimal values:  [0.28954095 4.11842105 6.05212487]
+  
 One can use informative prior. Let's use posterior as prior for the sake of
 example.
 ```python
@@ -157,7 +158,14 @@ console_opt = gpr_opt.interactive_optimization(bounds=bounds, n_init=100,
                                                n_solve=10, f_prior=f_post,
                                                max_iter=1, print_suggestion=False)
 optimal_values, suggestion, X_post, M_post, f_post = console_opt
+print('optimal values: ', optimal_values)
 ```
+    >>>                   x0        x1        x2
+    >>> preference  0.289541  4.118421  6.052125
+    >>> suggestion  1.601063  4.300604  5.208000
+    >>> Iteration 2, preference (p) or suggestion (s)? (Q to quit): Q
+    >>> optimal values:  [0.28954095 4.11842105 6.05212487]
+
 Download the algorithm with a GUI fully written in python on
 * https://sensguide.com
 ## 2. Bayesian optimization of a black-box function.

@@ -1,6 +1,6 @@
 
 
-# Preference learning with gaussian processes.
+# Preference learning with Gaussian processes.
 
 [![Build Status](https://travis-ci.org/chariff/GPro.svg?branch=master)](https://travis-ci.org/chariff/GPro)
 [![Codecov](https://codecov.io/github/chariff/GPro/badge.svg?branch=master&service=github)](https://codecov.io/github/chariff/GPro?branch=master)
@@ -12,7 +12,7 @@ learning based on Gaussian processes. Preference relations are captured
 in a Bayesian framework which allows in turn for global optimization of 
 the inferred functions (Gaussian processes) in as few iterations as possible.
 
-Installation
+Installation.
 ============
 
 ### Installation
@@ -34,7 +34,7 @@ GPro requires:
 Brief guide to using GPro.
 =========================
 
-Checkout the package docstrings for more informations.
+Checkout the package docstrings for more information.
 
 ## 1. Fitting and making Predictions.
 
@@ -67,7 +67,7 @@ gpr.fit(X, M, f_prior=None)
 Predict new values.
 ```python
 X_new = np.linspace(-6, 9, 100).reshape(-1, 1)
-predicted_values, predicted_vars = gpr.predict(X_new, return_y_var=True)
+predicted_values, predicted_deviations = gpr.predict(X_new, return_y_var=True)
 ```
 Plot.
 ```python
@@ -77,14 +77,14 @@ plt.plot(X.flat, gpr.predict(X).flat, 'bx', label='Preference')
 plt.ylabel('f(X)')
 plt.xlabel('X')
 plt.gca().fill_between(X_new.flatten(),
-                       (predicted_values - predicted_vars).flatten(),
-                       (predicted_values + predicted_vars).flatten(),
+                       (predicted_values - predicted_deviations).flatten(),
+                       (predicted_values + predicted_deviations).flatten(),
                        color="#b0e0e6", label='GP predictive posterior s.d.')
 plt.legend()
 plt.ylim([-2, 2])
 plt.show()
 ```
-The following plot shows how the posterior predictive gaussian process is adjusted to 
+The following plot shows how the posterior predictive Gaussian process is adjusted to 
 the data i.e. 2 is preferred to 1. One can also notice how the standard 
 deviation is small where there is data.  
 
@@ -94,7 +94,7 @@ deviation is small where there is data.
 
 Preference relations are captured in a Bayesian framework 
 which allows for global optimization of the latent function 
-(modelized by gaussian processes) describing the preference relations.
+(modelized by Gaussian processes) describing the preference relations.
 Interactive bayesian optimization with probit responses works by querying
 the user with a paired comparison and by subsequently updating the 
 Gaussian process model. The iterative procedure optimizes a utility function,
@@ -192,7 +192,7 @@ def random_sample(n, d, bounds, random_state=None):
                                   size=(n, d))
     return sample
 ```
-Sample parameters of a multivariate normal distribution
+Sample parameters of a multivariate normal distribution.
 ```python
 def sample_normal_params(n, d, bounds, scale_sigma=1, random_state=None):
     # sample centroids.

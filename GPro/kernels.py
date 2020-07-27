@@ -56,7 +56,7 @@ class Kernel:
             if key not in valid_params:
                 raise ValueError('Invalid parameter %s for kernel %s. '
                                  'Check the list of available parameters '
-                                 'with `kernel.get_params().keys()`.' %
+                                 'with `Kernel.get_params().keys()`.' %
                                  (key, self.__class__.__name__))
             setattr(self, key, value)
         return self

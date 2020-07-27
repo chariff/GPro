@@ -11,7 +11,7 @@ class PosteriorApproximation:
     """
 
     def get_params(self):
-        """Get the parameters of an acquisition function.
+        """Get the parameters of a posterior approximation function.
 
         Returns
         -------
@@ -54,7 +54,7 @@ class PosteriorApproximation:
                 raise ValueError('Invalid parameter %s for posterior '
                                  'approximation %s. '
                                  'Check the list of available parameters '
-                                 'with `kernel.get_params().keys()`.' %
+                                 'with `PosteriorApproximation.get_params().keys()`.' %
                                  (key, self.__class__.__name__))
             setattr(self, key, value)
         return self

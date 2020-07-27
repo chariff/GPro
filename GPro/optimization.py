@@ -105,7 +105,6 @@ class ProbitBayesianOptimization(ProbitPreferenceGP):
         """
         if not max_iter:
             raise ValueError('max_iter must be superior to 0.')
-        print()
         if not print_suggestion and max_iter > 1:
             raise ValueError('When print_suggestion is set to False, '
                              'max_iter must be set to 1.')

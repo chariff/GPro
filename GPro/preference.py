@@ -94,7 +94,7 @@ class ProbitPreferenceGP(Kernel, Acquisition):
     >>> gpr = ProbitPreferenceGP()
     >>> gpr.fit(X, M)
     >>> X_new = np.linspace(-6, 9, 100).reshape(-1, 1)
-    >>> predicted_values, predicted_vars = gpr.predict(X_new, return_y_var=True)
+    >>> predicted_values, predicted_vars = gpr.predict(X_new, return_y_std=True)
     >>> plt.plot(X_new, np.zeros(100), 'k--', label='GP prior')
     >>> plt.plot(X_new, predicted_values, 'r-', label='GP posterior')
     >>> plt.plot(X.flat, gpr.predict(X).flat, 'bx', label='Preference')
@@ -211,7 +211,7 @@ class ProbitPreferenceGP(Kernel, Acquisition):
             raise AttributeError("Unfitted gaussian probit regression model.")
         return self.f_posterior_
 
-    def predict(self, X, return_y_var=False):
+    def predict(self, X, return_y_std=False):
         """Predict using the Gaussian process regression model
 
         Parameters
@@ -219,7 +219,7 @@ class ProbitPreferenceGP(Kernel, Acquisition):
         X : array-like, shape = (n_samples, n_features)
             Query points where the GP is evaluated
 
-        return_y_var : bool, default: False
+        return_y_std : bool, default: False
             If True, the standard-deviation of the predictive distribution at
             the query points is returned along with the mean.
 
@@ -239,7 +239,7 @@ class ProbitPreferenceGP(Kernel, Acquisition):
         Lk = np.linalg.solve(self.L_, K_trans)
         Lf = np.linalg.solve(self.L_, self.f_posterior_)
         y_mean = np.dot(Lk.T, Lf)
-        if return_y_var:
+        if return_y_std:
             y_var = np.diag(self.kernel_(X)) - np.sum(Lk ** 2, axis=0)
             y_var_negative = y_var < 0
             if np.any(y_var_negative):
@@ -309,7 +309,7 @@ class ProbitPreferenceGP(Kernel, Acquisition):
                                 random_state=self.random_state)
 
         def aqc_optim(x, y_max):
-            y_mean, std = self.predict(X=x, return_y_var=True)
+            y_mean, std = self.predict(X=x, return_y_std=True)
             ys = acquisition(y_mean, std, y_max)
             return ys
 

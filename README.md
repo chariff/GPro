@@ -67,7 +67,7 @@ gpr.fit(X, M, f_prior=None)
 Predict new values.
 ```python
 X_new = np.linspace(-6, 9, 100).reshape(-1, 1)
-predicted_values, predicted_deviations = gpr.predict(X_new, return_y_var=True)
+predicted_values, predicted_deviations = gpr.predict(X_new, return_y_std=True)
 ```
 Plot.
 ```python

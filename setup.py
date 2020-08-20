@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='GPro',
-    version='1.0.1',
+    version='1.0.2',
     url='https://github.com/chariff/GPro',
     packages=find_packages(),
     author='Chariff Alkhassim',

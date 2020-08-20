@@ -88,7 +88,7 @@ The following plot shows how the posterior predictive Gaussian process is adjust
 the data i.e. 2 is preferred to 1. One can also notice how the standard 
 deviation is small where there is data.  
 
-![Gaussian process posterior](https://github.com/chariff/GPro/blob/master/examples/posterior_example.png)
+![Gaussian process posterior](https://github.com/chariff/GPro/raw/master/examples/posterior_example.png)
 
 ## 2. Interactive bayesian optimization.
 
@@ -265,7 +265,7 @@ if d == 2:
     plt.show()
 ```
 
-![](https://github.com/chariff/GPro/blob/master/examples/mvn_example.png)
+![](https://github.com/chariff/GPro/raw/master/examples/mvn_example.png)
 
 ### References:
 * http://mlg.eng.cam.ac.uk/zoubin/papers/icml05chuwei-pl.pdf

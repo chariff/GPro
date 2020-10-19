@@ -91,7 +91,7 @@ def check_x_m(x, m):
     assert x.shape[0] > 1, \
         "Array %r is of inconsistent size." % x
     # Check if indexes of m are consistent with size of x.
-    if m.max() > x.shape[0]:
+    if m.max() >= x.shape[0]:
         raise ValueError('Preferences should be indexes of X.')
     if any(np.subtract(m[:, 0], m[:, 1]) == 0):
         raise ValueError('m contains at least one set of preferences'

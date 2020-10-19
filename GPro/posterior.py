@@ -1,7 +1,6 @@
 from inspect import signature
 from scipy.stats import norm
 import numpy as np
-from itertools import compress
 
 
 class PosteriorApproximation:
@@ -126,9 +125,7 @@ class Laplace(PosteriorApproximation):
             b = np.zeros(n)
             m_set = np.linspace(0, n - 1, n, dtype=int)
             for i in m_set:
-                t_r, t_c = M[:, 0] == i, M[:, 1] == i
-                ind_r = list(compress(range(len(t_r)), t_r))
-                ind_c = list(compress(range(len(t_c)), t_c))
+                ind_r, ind_c = M[:, 0] == i, M[:, 1] == i
                 # Likelihood function of a preference relation.
                 z_r = z(f, M[ind_r, :])
                 z_c = z(f, M[ind_c, :])

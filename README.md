@@ -28,7 +28,7 @@ Installation.
 GPro requires:
 * Python (>= 3.5)
 * NumPy (>= 1.9.0)
-* SciPy (>= 0.14.0)
+* SciPy (< 1.5.0)
 * Pandas (>= 0.24.0) 
 
 Brief guide to using GPro.

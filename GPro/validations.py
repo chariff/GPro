@@ -79,7 +79,7 @@ def check_x_m(x, m):
         raise TypeError('Only integer preference data supported.')
     # float64 for x and int8 for m.
     x = set_d_type(x, d_type=np.float64)
-    m = set_d_type(m, d_type=np.int8)
+    m = set_d_type(m, d_type=np.int16)
     # Only finite numbers are supported.
     assert_finite(x), assert_finite(m)
     # Only positive numbers are supported for preferences.

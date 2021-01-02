@@ -318,12 +318,11 @@ class ProbitPreferenceGP(Kernel, Acquisition):
         x_max = x_tries[x_arg_max].reshape(1, -1)
         max_acq = ys.max()
         x_seeds = x_tries[np.argsort(ys.flat)][:n_solve]
-
         for x_try in x_seeds:
-            # Find the minimum of -1* acquisition function
+            # Find the minimum of -1 * acquisition function
             res = minimize(lambda x: -aqc_optim(x.reshape(1, -1),
-                                                y_max=y_max),
-                           x_try.reshape(1, -1),
+                                                y_max=y_max).ravel(),
+                           x_try,
                            bounds=bounds,
                            method=method)
             if not res.success:

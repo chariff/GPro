@@ -113,7 +113,7 @@ class Laplace(PosteriorApproximation):
         def z(f, M):
             """Likelihood function of a preference relation."""
             r, c = M[:, 0], M[:, 1]
-            return ((f[r] - f[c]) / np.sqrt(2) * self.s_eval).flatten()
+            return ((f[r] - f[c]) / np.sqrt(2 * self.s_eval)).flatten()
 
         def delta(f, M, K):
             """Root of the Taylor expansion derivative of log P(f|M)
@@ -140,14 +140,13 @@ class Laplace(PosteriorApproximation):
             for i in range(M_uni.shape[0]):
                 m, n = M_uni[i, 0], M_uni[i, 1]
                 z_mn = z(f, M_uni[[i], :])
-                z_nm = -z_mn
                 pdf_z = norm.pdf(z_mn)
                 cdf_z_mn = norm.cdf(z_mn)
-                cdf_z_nm = norm.cdf(z_nm)
                 c_mn = (pdf_z / cdf_z_mn) ** 2 + pdf_z / cdf_z_mn * z_mn
-                c_nm = (pdf_z / cdf_z_nm) ** 2 + pdf_z / cdf_z_nm * z_nm
-                c[m][n] = -(c_mn + c_nm) / 2 * self.s_eval
-                c[n][m] = -(c_mn + c_nm) / 2 * self.s_eval
+                c[m][n] -= c_mn / 2 / self.s_eval
+                c[n][m] -= c_mn / 2 / self.s_eval
+                c[m][m] += c_mn / 2 / self.s_eval
+                c[n][n] += c_mn / 2 / self.s_eval
             # Gradient
             Kf = np.linalg.solve(K, f)
             g = Kf.flatten() - b

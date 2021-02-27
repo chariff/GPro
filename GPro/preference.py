@@ -157,7 +157,7 @@ class ProbitPreferenceGP(Kernel, Acquisition):
             check_kernel(X, **self.kernel.get_params())
 
         if self.post_approx is None:  # Use a Laplace approximation
-            self.post_approx = Laplace(s_eval=1e-5, max_iter=1000,
+            self.post_approx = Laplace(s_eval=self.alpha, max_iter=1000,
                                        eta=0.01, tol=1e-5)
         else:
             if not hasattr(self.post_approx, "get_params"):
@@ -332,4 +332,3 @@ class ProbitPreferenceGP(Kernel, Acquisition):
                 x_max = res.x
                 max_acq = -res.fun[0]
         return np.clip(x_max, bounds[:, 0], bounds[:, 1]).reshape(1, d)
-

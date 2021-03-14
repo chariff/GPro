@@ -131,7 +131,7 @@ class Laplace(PosteriorApproximation):
                 z_c = z(f, M[ind_c, :])
                 pos_r = norm.pdf(z_r) / norm.cdf(z_r)
                 neg_c = norm.pdf(z_c) / norm.cdf(z_c)
-                b[i] = (sum(pos_r) - sum(neg_c)) / (np.sqrt(2))
+                b[i] = (sum(pos_r) - sum(neg_c)) / np.sqrt(2 * self.s_eval)
             # Quantities of the second order derivative
             # of the loss function p(f|M) with respect to f.
             # c can be shown to be positive semi-definite.

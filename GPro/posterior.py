@@ -108,6 +108,8 @@ class Laplace(PosteriorApproximation):
         f_new  : array-like, shape = (n_samples, 1)
         Laplace approximation of P(f|M).
 
+        c : array-like, shape = (n_samples, n_samples)
+            Hessian of the negative log likelihood function.
         """
 
         def z(f, M):
@@ -165,4 +167,9 @@ class Laplace(PosteriorApproximation):
             eps = np.linalg.norm(f_new - f_old, ord=2)
             f_old = f_new
             iteration += 1
-        return f_new
+
+        # nll Hessian to compute the predictive (co)variance.
+        _, H = delta(f_new, M, K)
+        c = H - np.linalg.inv(K)
+
+        return f_new, c

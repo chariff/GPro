@@ -201,7 +201,12 @@ class ProbitPreferenceGP(Kernel, Acquisition):
                 prior data supported.')
 
         # compute the posterior distribution of f
-        self.f_posterior_ = self.post_approx(f=f_prior, M=self.M_train_, K=K)
+        self.f_posterior_, c = self.post_approx(f=f_prior, M=self.M_train_, K=K)
+
+        # precompute part of the posterior covariance matrix
+        # (c K + I)^-1 c, where c is the nll Hessian
+        self.K_cov_inv = np.linalg.solve(c @ K + np.identity(K.shape[0]), c)
+
         return self
 
     @property
@@ -211,7 +216,7 @@ class ProbitPreferenceGP(Kernel, Acquisition):
             raise AttributeError("Unfitted gaussian probit regression model.")
         return self.f_posterior_
 
-    def predict(self, X, return_y_std=False):
+    def predict(self, X, return_y_std=False, return_y_cov=False):
         """Predict using the Gaussian process regression model
 
         Parameters
@@ -223,29 +228,51 @@ class ProbitPreferenceGP(Kernel, Acquisition):
             If True, the standard-deviation of the predictive distribution at
             the query points is returned along with the mean.
 
+        return_y_cov : bool, default: False
+            If True, the covariance of the joint predictive distribution at
+            the query points is returned along with the mean.
+
         Returns
         -------
-        mu : array, shape = (n_samples, [n_output_dims])
+        y_mean : array, shape = (n_samples, [n_output_dims])
             Mean of predictive distribution a query points
 
-        std : array, shape = (n_samples,), optional
+        y_std : array, shape = (n_samples,), optional
             Standard deviation of predictive distribution at query points.
-            Only returned when return_std is True.
+            Only returned when `return_y_std` is True.
+
+        y_cov : ndarray of shape (n_samples, n_samples), optional
+            Covariance of joint predictive distribution a query points.
+            Only returned when `return_y_cov` is True.
         """
         if not hasattr(self, "X_train_"):
             raise AttributeError("Unfitted gaussian probit regression model.")
+
+        if return_y_std and return_y_cov:
+            raise RuntimeError(
+                "Not returning standard deviation of predictions when "
+                "returning full covariance.")
 
         K_trans = self.kernel_(self.X_train_, X)
         Lk = np.linalg.solve(self.L_, K_trans)
         Lf = np.linalg.solve(self.L_, self.f_posterior_)
         y_mean = np.dot(Lk.T, Lf)
-        if return_y_std:
-            y_var = np.diag(self.kernel_(X)) - np.sum(Lk ** 2, axis=0)
+
+        if return_y_cov:
+            y_cov = self.kernel_(X) - K_trans.T @ self.K_cov_inv @ K_trans
+
+            return y_mean, y_cov
+        elif return_y_std:
+            # faster computation of the diagonal of `y_cov`
+            # mimics https://github.com/scikit-learn/scikit-learn/blob/main/sklearn/gaussian_process/_gpr.py#L368
+            y_var = np.diag(self.kernel_(X)) - \
+                np.einsum('ij,jk,ki->i', K_trans.T, self.K_cov_inv, K_trans)
             y_var_negative = y_var < 0
             if np.any(y_var_negative):
                 warnings.warn("Predicted variances smaller than 0. "
                               "Setting those variances to 0.")
                 y_var[y_var_negative] = 0.0
+
             return y_mean, np.sqrt(y_var).reshape(-1, 1)
         else:
             return y_mean

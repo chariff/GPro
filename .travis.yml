@@ -7,7 +7,9 @@ cache:
   - $HOME/.cache/pip
   - $HOME/download
 python:
-  - "3.5"
+  - "3.6"
+  - "3.7"
+  - "3.8"
 before_install:
   - pip install pip -U
   - pip install pytest -U

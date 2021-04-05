@@ -138,6 +138,7 @@ class Laplace(PosteriorApproximation):
             # of the loss function p(f|M) with respect to f.
             # c can be shown to be positive semi-definite.
             c = np.zeros((n, n))
+            diag_obs_c = (norm.pdf(0) / norm.cdf(0)) ** 2 / 2 / self.s_eval
             M_uni = np.unique(M, axis=0)
             for i in range(M_uni.shape[0]):
                 m, n = M_uni[i, 0], M_uni[i, 1]
@@ -147,8 +148,8 @@ class Laplace(PosteriorApproximation):
                 c_mn = (pdf_z / cdf_z_mn) ** 2 + pdf_z / cdf_z_mn * z_mn
                 c[m][n] -= c_mn / 2 / self.s_eval
                 c[n][m] -= c_mn / 2 / self.s_eval
-                c[m][m] += c_mn / 2 / self.s_eval
-                c[n][n] += c_mn / 2 / self.s_eval
+                c[m][m] += diag_obs_c
+                c[n][n] += diag_obs_c
             # Gradient
             Kf = np.linalg.solve(K, f)
             g = Kf.flatten() - b

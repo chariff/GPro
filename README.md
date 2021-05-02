@@ -27,7 +27,7 @@ Installation.
 ### Dependencies
 GPro requires:
 * Python (>= 3.5)
-* NumPy (>= 1.9.0)
+* NumPy+mkl (>= 1.9.0)
 * SciPy (< 1.5.0)
 * Pandas (>= 0.24.0) 
 
@@ -77,7 +77,7 @@ plt.plot(X_new, predicted_values, 'r-', label='GP predictive posterior')
 plt.plot(X.flat, gpr.predict(X).flat, 'bx', label='Preference')
 plt.ylabel('f(X)')
 plt.xlabel('X')
-# the predicted s.d. is devided for an aesthetic purpose.
+# the predicted s.d. is divided for an aesthetic purpose.
 plt.gca().fill_between(X_new.flatten(),
                        (predicted_values - predicted_deviations / 50).flatten(),
                        (predicted_values + predicted_deviations / 50).flatten(),

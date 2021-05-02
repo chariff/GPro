@@ -9,7 +9,7 @@ def read_me():
 
 setup(
     name='GPro',
-    version='1.0.4',
+    version='1.0.5',
     url='https://github.com/chariff/GPro',
     packages=find_packages(),
     author='Chariff Alkhassim',

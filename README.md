@@ -41,6 +41,7 @@ Checkout the package docstrings for more information.
 ```python
 from GPro.preference import ProbitPreferenceGP
 import numpy as np
+import matplotlib.pyplot as plt
 ```
 Training data consisting of numeric real positive values.
 A minimum of two values is required. The following example is in 1D.
@@ -76,12 +77,12 @@ plt.plot(X_new, predicted_values, 'r-', label='GP predictive posterior')
 plt.plot(X.flat, gpr.predict(X).flat, 'bx', label='Preference')
 plt.ylabel('f(X)')
 plt.xlabel('X')
+# the predicted s.d. is devided for an aesthetic purpose.
 plt.gca().fill_between(X_new.flatten(),
-                       (predicted_values - predicted_deviations).flatten(),
-                       (predicted_values + predicted_deviations).flatten(),
+                       (predicted_values - predicted_deviations / 50).flatten(),
+                       (predicted_values + predicted_deviations / 50).flatten(),
                        color="#b0e0e6", label='GP predictive posterior s.d.')
 plt.legend()
-plt.ylim([-2, 2])
 plt.show()
 ```
 The following plot shows how the posterior predictive Gaussian process is adjusted to 
@@ -119,7 +120,7 @@ GP_params = {'kernel': Matern(length_scale=1, nu=2.5),
                                     eta=0.01, tol=1e-3),
              'acquisition': UCB(kappa=2.576),
              'alpha': 1e-5,
-             'random_state': 2020}
+             'random_state': None}
 ```
 Instantiate a ProbitBayesianOptimization object with custom parameters.
 ```python
@@ -226,13 +227,13 @@ GP_params = {'kernel': Matern(length_scale=1, nu=2.5),
                                     eta=0.01, tol=1e-3),
              'acquisition': UCB(kappa=2.576),
              'alpha': 1e-5,
-             'random_state': 2020}
+             'random_state': None}
 # instantiate a ProbitBayesianOptimization object with custom parameters
 gpr_opt = ProbitBayesianOptimization(X, M, GP_params)
 ```
 Function optimization method.
 ```python
-function_opt = gpr_opt.function_optimization(f=f, bounds=bounds, max_iter=d*10,
+function_opt = gpr_opt.function_optimization(f=f, bounds=bounds, max_iter=50,
                                              n_init=1000, n_solve=1)
 
 optimal_values, X_post, M_post, f_post = function_opt

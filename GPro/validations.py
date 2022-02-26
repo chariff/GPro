@@ -158,7 +158,7 @@ def check_kernel(x, **params):
             length_scale supported.')
         elif any(length_scale) <= 0:
             raise ValueError("length_scale values must be positive.")
-        assert x.shape[0] == len(length_scale), \
+        assert x.shape[1] == len(length_scale), \
             "Array length_scale is of inconsistent dimension."
     elif isinstance(length_scale, str):
         raise ValueError("length_scale must be a positive scalar.")

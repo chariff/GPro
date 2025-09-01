@@ -355,7 +355,7 @@ class ProbitPreferenceGP(Kernel, Acquisition):
             if not res.success:
                 continue
             # Store it if better than previous minimum(maximum).
-            if max_acq is None or -res.fun[0] >= max_acq:
+            if max_acq is None or -res.fun >= max_acq:
                 x_max = res.x
-                max_acq = -res.fun[0]
+                max_acq = -res.fun
         return np.clip(x_max, bounds[:, 0], bounds[:, 1]).reshape(1, d)
